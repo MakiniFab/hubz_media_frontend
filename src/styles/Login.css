@@ -1,0 +1,89 @@
+/* Outer wrapper centers everything */
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: white;
+  padding: 20px;
+}
+
+/* The card itself */
+.login-container {
+  max-width: 700px;
+  width: 100%;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+  background: linear-gradient(135deg, #00c6ff, #7effb2); /* blue-green gradient */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #003366;
+}
+
+/* Input fields */
+.login-container input {
+  width: 90%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* Button styling */
+.login-container button {
+  width: 90%;
+  padding: 12px;
+  background: #003366;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-container button:hover {
+  background: #0059b3;
+}
+
+/* Error text */
+.error {
+  color: #b30000;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+/* Link section */
+.redirect-text {
+  margin-top: 15px;
+  color: #002244;
+}
+
+.register-link {
+  color: #003366;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    max-width: 95%;
+    padding: 50px;
+    margin-left: 5px;  /* shifts container slightly left */
+    margin-right: 30px; /* keeps some space on the right */
+  }
+
+  .login-card {
+    width: 100%;       /* make the card take full container width */
+    max-width: 500px;  /* optional limit so it doesn't get too wide */
+  }
+}

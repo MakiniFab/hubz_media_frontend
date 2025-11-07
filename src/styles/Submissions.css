@@ -1,0 +1,52 @@
+.submissions {
+  padding: 2rem;
+  background: #f5f6fa;
+  min-height: 100vh;
+}
+
+.submission-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+.submission-card h4 {
+  margin-bottom: 0.3rem;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: white;
+  margin-top: 0.5rem;
+}
+
+.status.approved { background: #28a745; }
+.status.rejected { background: #dc3545; }
+.status.pending  { background: #ffc107; color: black; }
+
+.comment-box {
+  display: flex;
+  margin-top: 0.8rem;
+}
+
+.comment-box input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.comment-box button {
+  margin-left: 0.5rem;
+  background: #0078ff;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}

@@ -1,0 +1,89 @@
+.dashboard-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #f7f9fc;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Admin/Editor Cards */
+.admin-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.stat-card {
+  flex: 1 1 200px;
+  min-width: 180px;
+  max-width: 250px;
+  background: linear-gradient(135deg, #00c6ff, #7effb2);
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.stat-card h4 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.stat-card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Journalist Table */
+.journalist-submissions table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.journalist-submissions th,
+.journalist-submissions td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+.journalist-submissions th {
+  background-color: #0078ff;
+  color: white;
+}
+
+.journalist-submissions tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-card {
+    width: 90%;
+    min-width: unset;
+  }
+
+  .journalist-submissions table {
+    font-size: 0.9rem;
+  }
+}

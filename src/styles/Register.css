@@ -1,0 +1,80 @@
+/* ✅ Make sure the whole page centers the card */
+body {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* full screen height */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* ✅ The card itself */
+.register-container {
+  width: 90%;
+  max-width: 700px;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+  background: linear-gradient(135deg, #00c6ff, #7effb2); /* blue-green gradient */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+/* ✅ Input & select styles (fixed width) */
+.register-container input,
+.register-container select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* ✅ Button styling */
+button {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 40px; /* space for icon */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+/* ✅ Center on smaller screens (optional adjustments) */
+@media (max-width: 768px) {
+  body {
+    padding: 20px;
+    align-items: flex-start;
+  }
+
+  .register-container {
+    margin: 40px auto; /* ✅ center horizontally */
+    width: 90%;        /* ✅ leave space on both sides */
+    max-width: 500px;  /* ✅ keep it comfortable on tablets */
+  }
+}
