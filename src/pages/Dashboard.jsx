@@ -7,7 +7,12 @@ function Dashboard() {
   const [stats, setStats] = useState(null);
   const [mySubmissions, setMySubmissions] = useState([]);
   const [error, setError] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newContent, setNewContent] = useState("");
+  const [newFile, setNewFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch user role and submissions
   useEffect(() => {
     const fetchUserRole = () => {
       const token = localStorage.getItem("token");
@@ -28,7 +33,7 @@ function Dashboard() {
           setStats(data);
         } else if (userRole === "journalist") {
           const { data } = await API.get("/submissions/");
-          setMySubmissions(data);
+          setMySubmissions(Array.isArray(data) ? data : []);
         }
       } catch (err) {
         setError("Unable to fetch dashboard data");
@@ -38,6 +43,65 @@ function Dashboard() {
     fetchUserRole();
     fetchData();
   }, [userRole]);
+
+  // Handle new submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!newTitle && !newContent && !newFile) {
+      setError("Please provide a title, content, or file");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      let fileUrl = null;
+
+      // If user selected a file, upload it first
+      if (newFile) {
+        const formData = new FormData();
+        formData.append("file", newFile);
+
+        // Use your file upload endpoint (create one if needed)
+        const uploadRes = await API.post("/upload_file", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        fileUrl = uploadRes.data.file_url;
+      }
+
+      // Send submission to backend
+      const { data } = await API.post("/submissions/", {
+        title: newTitle,
+        content: newContent,
+        file_url: fileUrl,
+      });
+
+      // Update local state
+      setMySubmissions((prev) => [
+        {
+          id: data.id,
+          title: newTitle,
+          content: newContent,
+          status: "pending",
+          file_url: fileUrl,
+          created_at: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+
+      // Reset form
+      setNewTitle("");
+      setNewContent("");
+      setNewFile(null);
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to create new submission");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!userRole) return <p>Loading...</p>;
 
@@ -72,15 +136,38 @@ function Dashboard() {
       {userRole === "journalist" && (
         <div className="journalist-submissions">
           <h3>My Submissions</h3>
-          {mySubmissions.length === 0 ? (
-            <p>No submissions yet</p>
-          ) : (
+
+          {/* New Submission Form */}
+          <form onSubmit={handleSubmit} className="new-submission-form">
+            <input
+              type="text"
+              placeholder="Title"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+            <textarea
+              placeholder="Content"
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+            ></textarea>
+            <input
+              type="file"
+              onChange={(e) => setNewFile(e.target.files[0])}
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? "Submitting..." : "Create Submission"}
+            </button>
+          </form>
+
+          {/* Submissions Table */}
+          {Array.isArray(mySubmissions) && mySubmissions.length > 0 ? (
             <table>
               <thead>
                 <tr>
                   <th>Title</th>
                   <th>Status</th>
                   <th>Created At</th>
+                  <th>File</th>
                 </tr>
               </thead>
               <tbody>
@@ -89,10 +176,21 @@ function Dashboard() {
                     <td>{sub.title}</td>
                     <td>{sub.status}</td>
                     <td>{new Date(sub.created_at).toLocaleString()}</td>
+                    <td>
+                      {sub.file_url ? (
+                        <a href={sub.file_url} target="_blank" rel="noopener noreferrer">
+                          View File
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          ) : (
+            <p>No submissions yet</p>
           )}
         </div>
       )}
