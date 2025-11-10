@@ -1,89 +1,251 @@
-.dashboard-container {
-  max-width: 1200px;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: #f7f9fc;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+/* ========================= */
+/* DASHBOARD GLOBAL STYLES   */
+/* ========================= */
+
+.dashboard-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 40px 100px;
+  font-family: "Inter", sans-serif;
+  color: #1e293b;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  transition: all 0.3s ease;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-}
+/* ========================= */
+/* HEADER SECTION            */
+/* ========================= */
 
-/* Admin/Editor Cards */
-.admin-stats {
+.dashboard-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
-
-.stat-card {
-  flex: 1 1 200px;
-  min-width: 180px;
-  max-width: 250px;
-  background: linear-gradient(135deg, #00c6ff, #7effb2);
-  color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.stat-card h4 {
-  margin-bottom: 10px;
-  font-size: 1.1rem;
-}
-
-.stat-card p {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-/* Journalist Table */
-.journalist-submissions table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.journalist-submissions th,
-.journalist-submissions td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ccc;
-}
-
-.journalist-submissions th {
-  background-color: #0078ff;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
   color: white;
+  padding: 25px 30px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 25px rgba(37, 99, 235, 0.3);
 }
 
-.journalist-submissions tr:nth-child(even) {
-  background-color: #f2f2f2;
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
-.error {
-  color: red;
-  text-align: center;
+.dashboard-header p {
+  margin-top: 6px;
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+/* ========================= */
+/* UPLOAD SECTION            */
+/* ========================= */
+
+.upload-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upload-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+}
+
+.upload-section h3 {
+  font-size: 1.4rem;
+  margin-bottom: 18px;
+  color: #1e3a8a;
+}
+
+.upload-section input[type="text"],
+.upload-section input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.upload-section input[type="text"]:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.upload-section button {
+  background: linear-gradient(90deg, #2563eb, #1e40af);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-section button:hover {
+  background: linear-gradient(90deg, #1d4ed8, #1e3a8a);
+  transform: scale(1.03);
+}
+
+.upload-section .message {
+  margin-top: 10px;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* ========================= */
+/* SUBMISSIONS SECTION       */
+/* ========================= */
+
+.submissions-section h3 {
   margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #1e3a8a;
 }
 
-/* Responsive */
+.submission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+/* ========================= */
+/* SUBMISSION CARD STYLING   */
+/* ========================= */
+
+.submission-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.submission-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.15);
+}
+
+/* Card Type Coloring */
+.submission-card.image {
+  background: linear-gradient(135deg, #e0f2fe, #fff);
+}
+
+.submission-card.video {
+  background: linear-gradient(135deg, #fef9c3, #fff);
+}
+
+.submission-card.audio {
+  background: linear-gradient(135deg, #ede9fe, #fff);
+}
+
+.submission-card.text,
+.submission-card.pdf {
+  background: linear-gradient(135deg, #fce7f3, #fff);
+}
+
+/* ========================= */
+/* THUMBNAIL SECTION         */
+/* ========================= */
+
+.thumbnail {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  font-size: 3rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.thumbnail img {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
+}
+
+/* ========================= */
+/* INFO SECTION              */
+/* ========================= */
+
+.submission-info {
+  padding: 18px;
+  text-align: left;
+}
+
+.submission-info h4 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.submission-info p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.submission-info .date {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ========================= */
+/* STATUS MESSAGES           */
+/* ========================= */
+
+.error-text {
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.message {
+  color: #2563eb;
+  margin-top: 10px;
+  font-size: 0.95rem;
+}
+
+/* ========================= */
+/* RESPONSIVE DESIGN         */
+/* ========================= */
+
 @media (max-width: 768px) {
-  .admin-stats {
+  .dashboard-header {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    text-align: left;
   }
 
-  .stat-card {
-    width: 90%;
-    min-width: unset;
+  .dashboard-header h2 {
+    font-size: 1.6rem;
   }
 
-  .journalist-submissions table {
-    font-size: 0.9rem;
+  .submission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .upload-section {
+    padding: 25px;
   }
 }

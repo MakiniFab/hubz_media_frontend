@@ -3,9 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
-// import Submissions from './pages/Submissions';
-// import Notifications from './pages/Notifications';
-// import NotFound from './pages/NotFound';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -15,9 +13,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/register" element={<Register />} />
-          {/* <Route path="/submissions" element={<Submissions />} />
-          <Route path="/notifications" element={<Notifications />} /> */}
-          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route path="/admin" element={<AdminDashboard/>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

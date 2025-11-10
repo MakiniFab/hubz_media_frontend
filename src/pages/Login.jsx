@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
 import "../styles/Login.css";
 
 function Login() {
@@ -8,15 +8,34 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { handleLogin } = useContext(AuthContext);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
-      await handleLogin(email, password);
-      navigate("/dashboard");
+      // Call backend login endpoint
+      const res = await axios.post("http://127.0.0.1:5000/auth/login", {
+        email,
+        password,
+      });
+
+      const { access_token, user } = res.data;
+
+      // ✅ Save all user details in localStorage
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("role", user.role || "journalist");
+      localStorage.setItem("name", user.name || "No Name");
+      localStorage.setItem("email", user.email || "");
+
+      // ✅ Redirect based on role
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
+      console.error("Login error:", err);
       setError(err.response?.data?.msg || "Login failed");
     }
   };

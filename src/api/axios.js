@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://kylan-unaisled-hazel.ngrok-free.dev',
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000',
 });
 
 // Add token to every request
