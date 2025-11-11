@@ -2,174 +2,152 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Dashboard.css";
 
-const Dashboard = () => {
-  const [file, setFile] = useState(null);
+const API_BASE = "http://localhost:5000/files";
+
+export default function Dashboard() {
+  const [files, setFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [title, setTitle] = useState("");
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
-  const [submissions, setSubmissions] = useState([]);
-  const [loadingSubs, setLoadingSubs] = useState(true);
-  const [errorSubs, setErrorSubs] = useState(null);
+  const [user, setUser] = useState({ name: "", email: "" });
 
-  // Retrieve user data from localStorage
   const token = localStorage.getItem("token");
-  const userName = localStorage.getItem("name");
-  const userEmail = localStorage.getItem("email");
 
-  // ---------------------------
-  // Fetch user's submissions
-  // ---------------------------
-  const fetchSubmissions = async () => {
-    setLoadingSubs(true);
-    setErrorSubs(null);
+  useEffect(() => {
+    const storedName = localStorage.getItem("name") || "Guest User";
+    const storedEmail = localStorage.getItem("email") || "guest@example.com";
+    setUser({ name: storedName, email: storedEmail });
+    fetchFiles();
+  }, []);
+
+  const fetchFiles = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:5000/submissions/", {
+      const res = await axios.get(`${API_BASE}/list`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSubmissions(res.data);
+      setFiles(res.data);
     } catch (err) {
-      console.error("Error fetching submissions:", err);
-      setErrorSubs("Failed to fetch submissions.");
-    } finally {
-      setLoadingSubs(false);
+      console.error("Error fetching files:", err);
+      setMessage(err.response?.status === 401 ? "Unauthorized: Please log in again." : "Failed to load files.");
     }
   };
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, []);
-
-  // ---------------------------
-  // Handle file upload
-  // ---------------------------
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-
-  const handleUpload = async () => {
-    if (!file) {
-      setMessage("Please select a file first.");
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      setMessage("Please select a file to upload.");
       return;
     }
 
-    setUploading(true);
-    setMessage("");
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("title", title || selectedFile.name);
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:5000/submissions/upload-url",
-        {
-          filename: file.name,
-          title: title || file.name,
-          mimetype: file.type || "application/octet-stream",
+      setUploading(true);
+      setMessage("");
+
+      const res = await axios.post(`${API_BASE}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setMessage(`Uploading... ${percentCompleted}%`);
         },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      });
 
-      const { upload_url, submission_id } = res.data;
-      console.log("Upload URL:", upload_url);
-
-      try {
-        await axios.put(upload_url, file, {
-          headers: { "Content-Type": file.type || "application/octet-stream" },
-        });
-      } catch (err) {
-        if (err.response && err.response.status === 400) {
-          console.warn("Supabase 400 warning:", err.message);
-        } else {
-          throw err;
-        }
-      }
-
-      setMessage(`✅ File uploaded successfully! Submission ID: ${submission_id}`);
+      setMessage(res.data.message || "File uploaded successfully!");
+      fetchFiles();
+      setSelectedFile(null);
       setTitle("");
-      setFile(null);
-      fetchSubmissions();
     } catch (err) {
       console.error("Upload error:", err);
-      setMessage(`Upload failed: ${err.message}`);
+      setMessage(err.response?.status === 401 ? "Unauthorized: Please log in again." : "File upload failed.");
     } finally {
       setUploading(false);
     }
   };
 
-  // ---------------------------
-  // Helper: Default Thumbnail
-  // ---------------------------
-  const getThumbnail = (mimetype) => {
-    if (!mimetype) return "📁";
-    if (mimetype.startsWith("image/")) return "🖼️";
-    if (mimetype.startsWith("video/")) return "🎬";
-    if (mimetype.startsWith("audio/")) return "🎵";
-    if (mimetype === "application/pdf") return "📄";
-    if (mimetype.startsWith("text/")) return "📝";
-    return "📎";
+  const handleView = async (filename) => {
+    try {
+      const res = await axios.get(`${API_BASE}/view/${filename}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      window.open(res.data.url, "_blank");
+    } catch (err) {
+      console.error("Error generating file URL:", err);
+      setMessage("Could not view file.");
+    }
+  };
+
+  const getFileIcon = (filename) => {
+    const ext = filename.split(".").pop().toLowerCase();
+    if (["mp4", "mov", "avi", "mkv"].includes(ext)) return "🎬";
+    if (["mp3", "wav", "aac"].includes(ext)) return "🎵";
+    if (["jpg", "png", "gif", "jpeg", "webp"].includes(ext)) return "🖼️";
+    if (["pdf", "docx", "txt"].includes(ext)) return "📄";
+    return "📁";
   };
 
   return (
-    <div className="dashboard-wrapper">
-      {/* Header */}
+    <div className="dashboard-container">
       <header className="dashboard-header">
         <div>
-          <h2>Welcome, {userName || "User"} 👋</h2>
-          <p>{userEmail}</p>
+          <h1>📁 File Dashboard</h1>
+          <p>Welcome back, <strong>{user.name}</strong></p>
+          <span className="user-email">{user.email}</span>
         </div>
       </header>
 
-      {/* Upload Section */}
-      <section className="upload-section">
-        <h3>Upload New Submission</h3>
+      {/* Upload Form */}
+      <form onSubmit={handleUpload} className="upload-form">
+        <input
+          type="file"
+          onChange={(e) => setSelectedFile(e.target.files[0])}
+          disabled={uploading}
+        />
         <input
           type="text"
-          placeholder="Title (optional)"
+          placeholder="Enter a description for your article"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          disabled={uploading}
         />
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={handleUpload} disabled={uploading}>
+        <button type="submit" disabled={uploading}>
           {uploading ? "Uploading..." : "Upload"}
         </button>
-        {message && <p className="message">{message}</p>}
-      </section>
+      </form>
 
-      {/* Submissions Section */}
-      <section className="submissions-section">
-        <h3>Your Submissions</h3>
-        {loadingSubs && <p>Loading submissions...</p>}
-        {errorSubs && <p className="error-text">{errorSubs}</p>}
-        {!loadingSubs && submissions.length === 0 && <p>No submissions found.</p>}
+      {message && <p className="message">{message}</p>}
 
-        {!loadingSubs && submissions.length > 0 && (
-          <div className="submission-grid">
-            {submissions.map((sub) => {
-              const fileUrl = `https://YOUR_SUPABASE_PROJECT_URL.supabase.co/storage/v1/object/public/submissions/${sub.file_url}`;
+      {uploading && (
+        <div className="spinner-container">
+          <div className="spinner"></div>
+        </div>
+      )}
 
-              return (
-                <div key={sub.id} className="submission-card">
-                  <div className="thumbnail">
-                    <a href={fileUrl} target="_blank" rel="noopener noreferrer">
-                      <div className="file-icon">{getThumbnail(sub.mimetype)}</div>
-                    </a>
-                  </div>
+      <hr />
 
-                  <div className="submission-info">
-                    <h4>{sub.title}</h4>
-                    <p>
-                      <strong>Status:</strong> {sub.status}
-                    </p>
-                    <p>
-                      <strong>Rating:</strong> {sub.rating || "N/A"}
-                    </p>
-                    <p className="date">
-                      {new Date(sub.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+      {/* Files List */}
+      <section className="files-section">
+        <h2>Uploaded Files</h2>
+        {files.length === 0 ? (
+          <p>No files found.</p>
+        ) : (
+          <div className="cards-container">
+            {files.map((file) => (
+              <div className="file-card" key={file.id}>
+                <div className="file-icon">{getFileIcon(file.filename)}</div>
+                <h3 className="file-name">{file.filename}</h3>
+                <p className="file-title">{file.title}</p>
+                <button onClick={() => handleView(file.filename)} className="view-btn">
+                  View
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </section>
     </div>
   );
-};
-
-export default Dashboard;
+}

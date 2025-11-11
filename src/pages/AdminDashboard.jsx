@@ -1,177 +1,173 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/AdminDashboard.css";
+import { useNavigate } from "react-router-dom";
 
-const AdminDashboard = () => {
+const API_BASE = "http://localhost:5000/files";
+const PROFILE_API = "http://localhost:5000/auth/profile"; // will append user_id
+
+export default function AdminDashboard() {
   const [submissions, setSubmissions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [authors, setAuthors] = useState({}); 
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
-  // ---------------------------
-  // Fetch all submissions
-  // ---------------------------
+  // Fetch submissions
   const fetchSubmissions = async () => {
-    setLoading(true);
-    setError(null);
+    if (!token) {
+      setError("No auth token found. Please log in.");
+      return;
+    }
     try {
-      const res = await axios.get("http://127.0.0.1:5000/submissions/", {
+      setLoading(true);
+      const res = await axios.get(`${API_BASE}/list`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSubmissions(res.data);
+      await fetchAuthorsParallel(res.data);
     } catch (err) {
-      console.error("Error fetching submissions:", err);
-      setError("Failed to fetch submissions.");
+      console.error(err);
+      setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch author profiles in parallel
+  const fetchAuthorsParallel = async (subs) => {
+    const uniqueAuthorIds = [...new Set(subs.map((s) => s.author_id))].filter(
+      (id) => !authors[id]
+    );
+
+    if (uniqueAuthorIds.length === 0) return;
+
+    try {
+      const requests = uniqueAuthorIds.map((id) =>
+        axios
+          .get(`${PROFILE_API}/${id}`)
+          .then((res) => ({ id, data: res.data }))
+          .catch(() => ({ id, data: { name: `User ${id}`, email: "N/A" } }))
+      );
+
+      const results = await Promise.all(requests);
+      const newAuthors = {};
+      results.forEach((r) => {
+        newAuthors[r.id] = { name: r.data.name, email: r.data.email };
+      });
+      setAuthors((prev) => ({ ...prev, ...newAuthors }));
+    } catch (err) {
+      console.error("Error fetching author profiles:", err);
+    }
+  };
+
   useEffect(() => {
     fetchSubmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ---------------------------
-  // Admin update: status/rating
-  // ---------------------------
-  const handleUpdate = async (id, field, value) => {
+  const updateSubmission = async (id, status, rating) => {
     try {
-      await axios.patch(
-        `http://127.0.0.1:5000/submissions/${id}`,
-        { [field]: value },
+      await axios.put(
+        `${API_BASE}/update/${id}`,
+        { status, rating },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchSubmissions();
     } catch (err) {
-      console.error("Update error:", err);
+      console.error(err);
+      alert("Failed to update submission: " + (err.response?.data?.error || err.message));
     }
   };
 
-  // ---------------------------
-  // Admin delete submission
-  // ---------------------------
-  const handleDelete = async (id) => {
+  const deleteSubmission = async (id) => {
     if (!window.confirm("Are you sure you want to delete this submission?")) return;
-
     try {
-      await axios.delete(`http://127.0.0.1:5000/submissions/${id}`, {
+      await axios.delete(`${API_BASE}/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchSubmissions();
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error(err);
+      alert("Failed to delete submission: " + (err.response?.data?.error || err.message));
     }
   };
 
-  // ---------------------------
-  // Upload new file
-  // ---------------------------
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!file) return alert("Please select a file first");
-
-    const formData = new FormData();
-    formData.append("file", file);
-
+  const viewFile = async (filename) => {
     try {
-      await axios.post("http://127.0.0.1:5000/submissions/upload", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Do NOT set Content-Type manually for multipart/form-data
-        },
-      });
-      setFile(null);
-      fetchSubmissions();
+      const res = await axios.get(`${API_BASE}/view/${filename}`);
+      window.open(res.data.url, "_blank");
     } catch (err) {
-      console.error("Upload error:", err);
-      alert("Upload failed");
+      console.error(err);
+      alert("Failed to view file: " + (err.response?.data?.error || err.message));
     }
   };
+
+  if (loading)
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+        <p>Loading submissions...</p>
+      </div>
+    );
+  if (error) return <div className="error-message">Error: {error}</div>;
 
   return (
     <div className="admin-dashboard">
-      <header className="admin-header">
-        <h2>Admin Dashboard</h2>
-      </header>
-
-      <section className="upload-section">
-        <h3>Upload New File</h3>
-        <form onSubmit={handleUpload}>
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-          <button type="submit">Upload</button>
-        </form>
-      </section>
-
-      <section className="submissions-section">
-        <h3>All Submissions</h3>
-        {loading && <p>Loading submissions...</p>}
-        {error && <p className="error-text">{error}</p>}
-        {!loading && submissions.length === 0 && <p>No submissions found.</p>}
-
-        {!loading && submissions.length > 0 && (
-          <div className="submission-grid">
-            {submissions.map((sub) => {
-              const { mimetype, file_url, title, id, status, rating, author_id, created_at } = sub;
-
-              // Display a clickable link for any file type
-              const public_url = `https://YOUR_SUPABASE_PROJECT_URL.supabase.co/storage/v1/object/public/submissions/${file_url}`;
-
-              const isImage = mimetype?.startsWith("image/");
-              const isVideo = mimetype?.startsWith("video/");
-              const isAudio = mimetype?.startsWith("audio/");
-
-              return (
-                <div key={id} className="submission-card">
-                  <div className="thumbnail">
-                    {isImage && <img src={public_url} alt={title} />}
-                    {isVideo && (
-                      <video src={public_url} controls width="100%" height="100%" preload="metadata" />
-                    )}
-                    {isAudio && <audio src={public_url} controls />}
-                    {!isImage && !isVideo && !isAudio && (
-                      <a href={public_url} target="_blank" rel="noopener noreferrer">
-                        View File
-                      </a>
-                    )}
-                  </div>
-
-                  <div className="submission-info">
-                    <h4>{title}</h4>
-                    <p><strong>Author ID:</strong> {author_id}</p>
-                    <p>
-                      <strong>Status:</strong>{" "}
-                      <select value={status} onChange={(e) => handleUpdate(id, "status", e.target.value)}>
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-                    </p>
-                    <p>
-                      <strong>Rating:</strong>{" "}
-                      <input
-                        type="number"
-                        min="0"
-                        max="5"
-                        value={rating || ""}
-                        onChange={(e) => handleUpdate(id, "rating", e.target.value)}
-                      />
-                    </p>
-                    <p className="date">{new Date(created_at).toLocaleString()}</p>
-                    <button className="delete-btn" onClick={() => handleDelete(id)}>Delete</button>
-                  </div>
+      <h2>Admin Dashboard</h2>
+      <div className="cards-container">
+        {submissions.map((s) => {
+          const author = authors[s.author_id] || { name: s.author_id, email: "N/A" };
+          return (
+            <div key={s.id} className="submission-card">
+              <div className="card-header">
+                <strong>{s.title}</strong>
+                <span className="author-name">
+                  By: {author.name} ({author.email})
+                </span>
+              </div>
+              <div className="card-body">
+                <button className="view-btn" onClick={() => viewFile(s.filename)}>
+                  View File
+                </button>
+                <div className="status-rating">
+                  <select
+                    value={s.status}
+                    onChange={(e) => updateSubmission(s.id, e.target.value, s.rating)}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    value={s.rating || ""}
+                    onChange={(e) =>
+                      updateSubmission(s.id, s.status, parseInt(e.target.value) || 0)
+                    }
+                  />
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
+                <button className="delete-btn" onClick={() => deleteSubmission(s.id)}>
+                  Delete
+                </button>
+                <button
+                  className="comment-btn"
+                  onClick={() => navigate(`/comment/${s.id}`)}
+                >
+                  Comment
+                </button>
+              </div>
+              <div className="card-footer">
+                <small>Created: {new Date(s.created_at).toLocaleString()}</small>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
-};
-
-export default AdminDashboard;
+}
