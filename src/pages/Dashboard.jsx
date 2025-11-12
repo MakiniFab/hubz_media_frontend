@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Sidebar from "../components/Sidebar";
 import "../styles/Dashboard.css";
 
 const API_BASE = "http://localhost:5000/files";
@@ -91,6 +92,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
+      <Sidebar />
       <header className="dashboard-header">
         <div>
           <h1>📁 File Dashboard</h1>
@@ -134,13 +136,19 @@ export default function Dashboard() {
         {files.length === 0 ? (
           <p>No files found.</p>
         ) : (
-          <div className="cards-container">
+          <div className="card-container">
             {files.map((file) => (
               <div className="file-card" key={file.id}>
                 <div className="file-icon">{getFileIcon(file.filename)}</div>
+                <p className="file-created_at">
+                  Submitted on:{" "}
+                  {new Date(file.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}{" "}
+                  {new Date(file.created_at).toLocaleDateString()}
+                </p>
                 <h3 className="file-name">{file.filename}</h3>
                 <p className="file-title">{file.title}</p>
                 <button onClick={() => handleView(file.filename)} className="view-btn">
+                
                   View
                 </button>
               </div>

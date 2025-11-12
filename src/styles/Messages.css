@@ -1,149 +1,238 @@
-/* ---------------------------
-   Container & Title
---------------------------- */
+/* ----------------------------
+   Chat Container - Full Width
+---------------------------- */
 .chat-container {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #fefefe;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
-}
-
-.chat-title {
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f5f8;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
+  padding: 20px;
+  gap: 20px;
 }
 
-/* ---------------------------
+/* ----------------------------
+   Page Title
+---------------------------- */
+.chat-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #28a745; /* bright green */
+  margin-bottom: 15px;
+}
+
+/* ----------------------------
    Messages List
---------------------------- */
+---------------------------- */
 .chat-messages {
-  max-height: 400px;
+  flex: 1 1 auto;
+  max-height: calc(100vh - 200px);
   overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  background-color: #fafafa;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
 }
 
+/* ----------------------------
+   Individual Message Card
+---------------------------- */
 .chat-message {
-  background-color: #fff;
-  padding: 10px 15px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  position: relative;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.chat-message:hover {
+  transform: translateY(-2px);
+  background-color: #e6ffe6; /* subtle green on hover */
 }
 
 .chat-sender {
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #1a73e8;
-}
-
-.chat-content {
-  margin: 5px 0;
-  color: #333;
+  font-weight: 700;
+  color: #28a745; /* green for sender */
+  margin-bottom: 3px;
 }
 
 .chat-reply {
   font-size: 0.85rem;
-  color: #555;
-  margin-bottom: 5px;
+  color: #dc3545; /* red for reply text */
   padding-left: 10px;
-  border-left: 2px solid #ddd;
+  border-left: 3px solid #28a745; /* green left border */
+  margin-bottom: 5px;
+}
+
+.chat-content {
+  font-size: 0.95rem;
+  word-wrap: break-word;
 }
 
 .chat-reply-btn {
-  font-size: 0.8rem;
+  align-self: flex-start;
+  font-size: 0.85rem;
   background-color: transparent;
+  color: #dc3545; /* red reply button */
   border: none;
-  color: #1a73e8;
   cursor: pointer;
-  padding: 0;
+  transition: color 0.2s ease;
 }
 
 .chat-reply-btn:hover {
-  text-decoration: underline;
+  color: #a71d2a;
 }
 
-.no-messages {
-  text-align: center;
-  color: #888;
-  font-style: italic;
-}
-
-/* ---------------------------
-   Message Input Form
---------------------------- */
+/* ----------------------------
+   Input Form
+---------------------------- */
 .chat-form {
+  width: 100%;
+  margin-top: auto;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .chat-input {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 12px;
   border: 1px solid #ccc;
   resize: none;
-  font-size: 1rem;
-  margin-bottom: 10px;
-  outline: none;
+  transition: all 0.2s ease;
 }
 
 .chat-input:focus {
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  outline: none;
+  border-color: #28a745; /* green focus */
+  box-shadow: 0 0 5px rgba(40,167,69,0.3);
 }
 
 .chat-send-btn {
   align-self: flex-end;
-  background-color: #1a73e8;
-  color: #fff;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  background-color: #28a745; /* green send button */
+  color: white;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .chat-send-btn:hover {
-  background-color: #155ab6;
+  background-color: #218838;
+  transform: scale(1.05);
 }
 
 .chat-send-btn:disabled {
-  background-color: #a0c1f7;
+  background-color: #999;
   cursor: not-allowed;
 }
 
-/* ---------------------------
-   Reply Banner
---------------------------- */
 .replying-to {
-  font-size: 0.85rem;
-  color: #555;
-  margin-bottom: 5px;
-  background-color: #eef4ff;
+  font-size: 0.9rem;
+  color: #dc3545; /* red for reply note */
+  background-color: #ffe6e6; /* subtle red background */
   padding: 5px 10px;
-  border-left: 4px solid #1a73e8;
-  border-radius: 6px;
+  border-left: 3px solid #dc3545;
+  border-radius: 8px;
 }
 
 .cancel-reply {
-  color: #e53935;
-  margin-left: 8px;
+  color: #dc3545;
   cursor: pointer;
+  margin-left: 10px;
   font-weight: bold;
 }
 
-.cancel-reply:hover {
-  text-decoration: underline;
+/* ----------------------------
+   No Messages
+---------------------------- */
+.no-messages {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #888;
+  padding: 20px 0;
+}
+
+/* ----------------------------
+   Scrollbar Styling
+---------------------------- */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: #28a745;
+  border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #f5f5f8;
+}
+
+/* ----------------------------
+   Responsive Design
+---------------------------- */
+@media (max-width: 768px) {
+  .chat-title {
+    font-size: 1.8rem;
+  }
+
+  .chat-input {
+    font-size: 0.95rem;
+  }
+
+  .chat-send-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-title {
+    font-size: 1.5rem;
+  }
+
+  .chat-input {
+    font-size: 0.9rem;
+  }
+
+  .chat-send-btn {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .chat-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    width: 250%;
+    position: relative;
+    left: -25rem;
+  }
+
+  .chat-messages {
+    padding: 30px;
+  }
+
+  .chat-title {
+    font-size: 2.5rem; /* slightly bigger title */
+  }
+
+  .chat-send-btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+  }
 }

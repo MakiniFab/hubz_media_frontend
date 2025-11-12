@@ -6,21 +6,29 @@ import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import CommentPage from './pages/CommentPage';
 import Messages from './pages/Messages';
+import Approved from './components/Approved';
+import Rejected from './components/Rejected';
+import Layout from './components/Layout';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/admin" element={<AdminDashboard/>} />
-          <Route path="/comment/:id" element={<CommentPage />} />
-          <Route path="/messages" element={<Messages />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<AdminDashboard/>} />
+            <Route path="/comment/:id" element={<CommentPage />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/approved" element={<Approved/>} />
+            <Route path="/rejected" element={<Rejected/>} />
+          </Routes>
+          <Layout/>
+        </BrowserRouter>
+      </AuthProvider>
+    </>
   );
 }
 

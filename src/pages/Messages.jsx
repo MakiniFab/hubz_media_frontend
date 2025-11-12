@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Sidebar from "../components/Sidebar";
 import "../styles/Messages.css";
 
 const Messages = () => {
@@ -75,6 +76,7 @@ const Messages = () => {
 
   return (
     <div className="chat-container">
+      <Sidebar />
       <h1 className="chat-title">Global Chat Room</h1>
 
       {/* Messages list */}
