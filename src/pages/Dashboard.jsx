@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "../styles/Dashboard.css";
 
@@ -11,14 +12,16 @@ export default function Dashboard() {
   const [title, setTitle] = useState("");
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
-  const [user, setUser] = useState({ name: "", email: "" });
+  const navigate = useNavigate();
+  const [user, setUser] = useState({ name: "", email: "", role: "" });
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const storedName = localStorage.getItem("name") || "Guest User";
     const storedEmail = localStorage.getItem("email") || "guest@example.com";
-    setUser({ name: storedName, email: storedEmail });
+    const storedRole = localStorage.getItem("role") || "user";
+    setUser({ name: storedName, email: storedEmail, role: storedRole });
     fetchFiles();
   }, []);
 
@@ -96,6 +99,14 @@ export default function Dashboard() {
       <header className="dashboard-header">
         <div>
           <h1>📁 File Dashboard</h1>
+          {user.role === "admin" && (
+            <button
+              className="admin-btn"
+              onClick={() => navigate("/admin")}
+            >
+              Admin
+            </button>
+          )}
           <p>Welcome back, <strong>{user.name}</strong></p>
           <span className="user-email">{user.email}</span>
         </div>

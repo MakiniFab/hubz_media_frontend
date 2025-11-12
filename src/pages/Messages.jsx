@@ -77,7 +77,7 @@ const Messages = () => {
   return (
     <div className="chat-container">
       <Sidebar />
-      <h1 className="chat-title">Global Chat Room</h1>
+      <h1 className="chat-title">Chat Room</h1>
 
       {/* Messages list */}
       <div className="chat-messages">

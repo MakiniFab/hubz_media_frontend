@@ -117,29 +117,33 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <h2>Admin Dashboard</h2>
-      <div className="cards-container">
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="home-button"
+      ></button>
+      <div className="admin-cards-container">
         {submissions.map((s) => {
           const author = authors[s.author_id] || { name: s.author_id, email: "N/A" };
           return (
-            <div key={s.id} className="submission-card">
-              <div className="card-header">
+            <div key={s.id} className="admin-submission-card">
+              <div className="admin-card-header">
                 <strong>{s.title}</strong>
-                <span className="author-name">
+                <span className="admin-author-name">
                   By: {author.name} ({author.email})
                 </span>
               </div>
-              <div className="card-body">
-                <button className="view-btn" onClick={() => viewFile(s.filename)}>
+              <div className="admin-card-body">
+                <button className="admin-view-btn" onClick={() => viewFile(s.filename)}>
                   View File
                 </button>
-                <div className="status-rating">
+                <div className="admin-status-rating">
                   <select
                     value={s.status}
                     onChange={(e) => updateSubmission(s.id, e.target.value, s.rating)}
                   >
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="admin-pending">Pending</option>
+                    <option value="admin-approved">Approved</option>
+                    <option value="admin-rejected">Rejected</option>
                   </select>
                   <input
                     type="number"
@@ -151,17 +155,17 @@ export default function AdminDashboard() {
                     }
                   />
                 </div>
-                <button className="delete-btn" onClick={() => deleteSubmission(s.id)}>
+                <button className="admin-delete-btn" onClick={() => deleteSubmission(s.id)}>
                   Delete
                 </button>
                 <button
-                  className="comment-btn"
+                  className="admin-comment-btn"
                   onClick={() => navigate(`/comment/${s.id}`)}
                 >
                   Comment
                 </button>
               </div>
-              <div className="card-footer">
+              <div className="admin-card-footer">
                 <small>Created: {new Date(s.created_at).toLocaleString()}</small>
               </div>
             </div>

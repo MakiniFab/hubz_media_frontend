@@ -39,6 +39,21 @@
   color: #d0e6ff;
 }
 
+.admin-btn {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #e68900;
+}
+
 /* ----------------------------
    Upload Form
 ---------------------------- */
@@ -261,6 +276,7 @@ hr {
   }
   .dashboard-container{
     max-width: 3500px;
+    margin-bottom: 8rem;
   }
   .upload-form {
     width: 50%;

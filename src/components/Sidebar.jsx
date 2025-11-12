@@ -28,6 +28,9 @@ const Sidebar = () => {
           <li>
             <Link to="/messages" onClick={toggleSidebar}>Chatroom</Link>
           </li>
+          <li>
+            <Link to="/analytics" onClick={toggleSidebar}>Leaderboards</Link>
+          </li>
         </ul>
       </div>
 

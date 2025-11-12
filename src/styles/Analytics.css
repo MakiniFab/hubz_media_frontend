@@ -1,0 +1,110 @@
+/* Base Styles */
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.analytics-content {
+  flex: 1;
+  padding: 1rem;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.leaderboard-table th {
+  background: #f3f4f6;
+  font-weight: bold;
+}
+
+.chart-section {
+  margin-top: 2rem;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* ---------------------------------
+   Responsive Media Queries
+---------------------------------- */
+
+/* Small mobile - 320px */
+@media (max-width: 320px) {
+  .analytics-container {
+    padding: 0.5rem;
+  }
+  .leaderboard-table {
+    font-size: 0.7rem;
+  }
+}
+
+/* Mobile - 375px */
+@media (max-width: 375px) {
+  .leaderboard-table {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile - 425px */
+@media (max-width: 425px) {
+  .leaderboard-table {
+    font-size: 0.8rem;
+  }
+}
+
+/* Tablet - 768px */
+@media (max-width: 768px) {
+  .analytics-container {
+    padding: 1rem;
+  }
+  .leaderboard-table {
+    font-size: 0.9rem;
+  }
+  .chart-section {
+    margin-top: 1.5rem;
+  }
+}
+
+/* Laptop - 1024px */
+@media (max-width: 1024px) {
+  .leaderboard-table {
+    font-size: 1rem;
+  }
+}
+
+/* Desktop - 1440px */
+@media (max-width: 1440px) {
+  .leaderboard-table {
+    font-size: 1.1rem;
+  }
+}
+
+/* Large screens / 4K - 2560px */
+@media (min-width: 2560px) {
+  .analytics-container {
+    padding: 3rem 10rem;
+  }
+  .leaderboard-table {
+    font-size: 1.5rem;
+  }
+  .chart-section {
+    margin-top: 3rem;
+  }
+}
