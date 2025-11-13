@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
@@ -8,7 +7,6 @@ import CommentPage from './pages/CommentPage';
 import Messages from './pages/Messages';
 import Approved from './components/Approved';
 import Rejected from './components/Rejected';
-import Layout from './components/Layout';
 import Analytics from './pages/Analytics';
 import NotFound from './pages/NotFound';
 
@@ -18,19 +16,20 @@ function AppRoutes() {
 
   return (
     <>
-      {/* Render logout if current path is not / or /register */}
+      {/* Example: render NotFound or any other component conditionally */}
       {!hideLogoutPaths.includes(location.pathname) && <NotFound />}
 
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<AdminDashboard/>} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/comments/:id" element={<CommentPage />} />
         <Route path="/messages" element={<Messages />} />
-        <Route path="/approved" element={<Approved/>} />
-        <Route path="/rejected" element={<Rejected/>} />
-        <Route path="/analytics" element={<Analytics/>} />
+        <Route path="/approved" element={<Approved />} />
+        <Route path="/rejected" element={<Rejected />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
       </Routes>
     </>
   );
@@ -38,12 +37,9 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <Layout />
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 
