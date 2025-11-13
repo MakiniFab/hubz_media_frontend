@@ -4,8 +4,8 @@ import "../styles/AdminDashboard.css";
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://localhost:5000/files";
-const PROFILE_API = "http://localhost:5000/auth/profile"; 
+const API_BASE = "https://hubz-media-backend.onrender.com/files";
+const PROFILE_API = "https://hubz-media-backend.onrender.com/auth/profile"; 
 
 export default function AdminDashboard() {
   const [submissions, setSubmissions] = useState([]);

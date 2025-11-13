@@ -18,7 +18,7 @@ const CommentPage = () => {
   const fetchComments = async () => {
     try {
       const res = await axios.get(
-        `http://127.0.0.1:5000/comments/submission/${id}/comments`,
+        `https://hubz-media-backend.onrender.com/comments/submission/${id}/comments`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -38,7 +38,7 @@ const CommentPage = () => {
     setLoading(true);
     try {
       await axios.post(
-        `http://127.0.0.1:5000/comments/submission/${id}/comment`,
+        `https://hubz-media-backend.onrender.com/comments/submission/${id}/comment`,
         {
           content: newComment,
           rating: rating ? Number(rating) : null,

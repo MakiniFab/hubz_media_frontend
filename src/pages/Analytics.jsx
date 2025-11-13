@@ -4,7 +4,7 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import "../styles/Analytics.css";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://hubz-media-backend.onrender.com";
 const token = localStorage.getItem("token");
 
 export default function Analytics() {

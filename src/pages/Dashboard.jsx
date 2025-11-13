@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "../styles/Dashboard.css";
 
-const API_BASE = "http://localhost:5000/files";
+const API_BASE = "https://hubz-media-backend.onrender.com/files";
 
 export default function Dashboard() {
   const [files, setFiles] = useState([]);
@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const [authors, setAuthors] = useState({});
-  const PROFILE_API = "http://localhost:5000/auth/profile";
+  const PROFILE_API = "https://hubz-media-backend.onrender.com/auth/profile";
   const [user, setUser] = useState({ name: "", email: "", role: "" });
 
   const token = localStorage.getItem("token");

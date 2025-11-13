@@ -3,8 +3,8 @@ import axios from "axios";
 import Sidebar from "./Sidebar";
 import "../styles/Approved.css"
 
-const FILES_API = "http://localhost:5000/files";
-const COMMENTS_API = "http://localhost:5000/comments";
+const FILES_API = "https://hubz-media-backend.onrender.com/files";
+const COMMENTS_API = "https://hubz-media-backend.onrender.com/comments";
 
 export default function Approved() {
   const [files, setFiles] = useState([]);

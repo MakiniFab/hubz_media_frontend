@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/Layout.css"; // CSS for footer styling
+import "../styles/Layout.css"; 
 
 export default function Layout() {
   return (

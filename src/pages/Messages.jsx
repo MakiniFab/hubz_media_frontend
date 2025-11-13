@@ -18,7 +18,7 @@ const Messages = () => {
   // ---------------------------
   const fetchMessages = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:5000/messages/chat/all", {
+      const res = await axios.get("https://hubz-media-backend.onrender.com/messages/chat/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(res.data); // messages are already ordered by created_at in backend
@@ -47,7 +47,7 @@ const Messages = () => {
       const payload = { content: newMessage };
       if (replyTo) payload.reply_to_id = replyTo.id;
 
-      await axios.post("http://127.0.0.1:5000/messages/chat/send", payload, {
+      await axios.post("https://hubz-media-backend.onrender.com/messages/chat/send", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
