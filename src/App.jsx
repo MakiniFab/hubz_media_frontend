@@ -1,44 +1,45 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import Layout from "./components/Layout";
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import CommentPage from './pages/CommentPage';
 import Messages from './pages/Messages';
 import Approved from './components/Approved';
 import Rejected from './components/Rejected';
 import Analytics from './pages/Analytics';
+import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
+import PrivateSend from "./pages/PrivateSend";
 
-function AppRoutes() {
+// Component to conditionally show NotFound
+function NotFoundWrapper() {
   const location = useLocation();
-  const hideLogoutPaths = ['/', '/register'];
+  const hideNotFound = ['/', '/register'];
 
+  return !hideNotFound.includes(location.pathname) ? <NotFound /> : null;
+}
+
+function App() {
   return (
-    <>
-      {/* Example: render NotFound or any other component conditionally */}
-      {!hideLogoutPaths.includes(location.pathname) && <NotFound />}
-
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/comments/:id" element={<CommentPage />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/approved" element={<Approved />} />
         <Route path="/rejected" element={<Rejected />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
+        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/private" element={<PrivateSend/>} />
       </Routes>
-    </>
-  );
-}
-
-function App() {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
+      <NotFoundWrapper />
+      {/* <Layout /> */}
     </BrowserRouter>
   );
 }

@@ -14,19 +14,26 @@ const Messages = () => {
   const token = localStorage.getItem("token");
 
   // ---------------------------
-  // Fetch all messages
-  // ---------------------------
-  const fetchMessages = async () => {
-    try {
-      const res = await axios.get("https://hubz-media-backend.onrender.com/messages/chat/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessages(res.data); // messages are already ordered by created_at in backend
-    } catch (err) {
-      console.error("Error fetching messages:", err);
-      toast.error("Failed to load messages");
-    }
-  };
+// Fetch all messages
+// ---------------------------
+const fetchMessages = async () => {
+  try {
+    const res = await axios.get("https://hubz-media-backend.onrender.com/messages/chat/all", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    console.log(res.data)
+    const filtered = res.data.filter(msg => {
+      const c = msg.content?.trim();
+      return !c?.startsWith( '{"file_url":');
+    });
+
+    setMessages(filtered);
+  } catch (err) {
+    console.error("Error fetching messages:", err);
+    toast.error("Failed to load messages");
+  }
+};
 
   // Poll messages every 5 seconds
   useEffect(() => {

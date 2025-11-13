@@ -1,0 +1,112 @@
+/* Container */
+.private-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+.main-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+/* Send Card */
+.send-card {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 25px;
+}
+
+.send-card select,
+.send-card button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid #d3dce6;
+  font-size: 1rem;
+}
+
+.send-card button {
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.send-card button:hover {
+  background: #1d4ed8;
+}
+
+/* Message list */
+.messages-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.message-bubble {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+.message-top-url {
+  font-size: 0.85rem;
+  word-break: break-all;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.message-info {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+/* View Button */
+.view-btn {
+  padding: 8px 14px;
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.view-btn:hover {
+  background: #0284c7;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .private-container {
+    padding: 10px;
+  }
+
+  .message-bubble {
+    padding: 12px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

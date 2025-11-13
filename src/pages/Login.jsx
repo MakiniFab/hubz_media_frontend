@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/Login.css";
 
@@ -83,7 +84,14 @@ function Login() {
           </div>
           <button type="submit">Login</button>
         </form>
-
+        <p>
+          <Link
+            to="/reset"
+            style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+          >
+            Forgot password?
+          </Link>
+        </p>
         <p className="redirect-text">
           Don’t have an account?{" "}
           <a href="/register" className="register-link">
