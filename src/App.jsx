@@ -26,7 +26,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminDashboard/>} />
-        <Route path="/comment/:id" element={<CommentPage />} />
+        <Route path="/comments/:id" element={<CommentPage />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/approved" element={<Approved/>} />
         <Route path="/rejected" element={<Rejected/>} />

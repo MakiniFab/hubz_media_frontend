@@ -50,16 +50,24 @@
 .file-card-rejected {
   border: 1px solid #ddd;
   border-radius: 10px;
-  padding: 15px;
+  padding: 10px;         
   text-align: center;
   background-color: #fafafa;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   width: 240px;
-  min-height: 280px;
+  min-height: 280px;   
   flex: 1 1 auto;
   position: relative;
   transition: transform 0.2s ease;
+  overflow-y: auto;  
 }
+
+.file-card-rejected h3,
+.file-card-rejected p {
+  margin: 2px 0;        
+  line-height: 1.2;      
+}
+
 
 .file-card-rejected:hover {
   transform: translateY(-5px);

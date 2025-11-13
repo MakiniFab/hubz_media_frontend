@@ -7,21 +7,44 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    role: "choose role",
+    role: "journalist",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
+  // Validation functions
+  const isValidEmail = (email) => /^[^\s@]+@gmail\.com$/.test(email);
+
+  const isValidPassword = (password) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(password);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setMessage("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
+
+    // Frontend validations
+    if (!formData.name.trim()) {
+      setMessage("❌ Name cannot be empty");
+      return;
+    }
+    if (!isValidEmail(formData.email)) {
+      setMessage("❌ Please enter a valid Gmail address (example@gmail.com).");
+      return;
+    }
+    if (!isValidPassword(formData.password)) {
+      setMessage(
+        "❌ Password must be at least 6 characters, include 1 uppercase, 1 lowercase, and 1 number."
+      );
+      return;
+    }
 
     try {
+      // API call to backend
       const res = await fetch("http://127.0.0.1:5000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,6 +76,9 @@ const Register = () => {
           value={formData.name}
           onChange={handleChange}
           required
+          style={{
+            borderColor: !formData.name ? "" : formData.name.trim() ? "green" : "red",
+          }}
         />
 
         <input
@@ -62,7 +88,20 @@ const Register = () => {
           value={formData.email}
           onChange={handleChange}
           required
+          style={{
+            borderColor:
+              !formData.email
+                ? ""
+                : isValidEmail(formData.email)
+                ? "green"
+                : "red",
+          }}
         />
+        {!isValidEmail(formData.email) && formData.email && (
+          <small style={{ color: "red" }}>
+            Must be a valid Gmail address (example@gmail.com)
+          </small>
+        )}
 
         {/* Password input with eye toggle */}
         <div className="password-field">
@@ -73,6 +112,14 @@ const Register = () => {
             value={formData.password}
             onChange={handleChange}
             required
+            style={{
+              borderColor:
+                !formData.password
+                  ? ""
+                  : isValidPassword(formData.password)
+                  ? "green"
+                  : "red",
+            }}
           />
           <span
             className="toggle-password"
@@ -81,6 +128,11 @@ const Register = () => {
             {showPassword ? "🙈" : "👁️"}
           </span>
         </div>
+        {!isValidPassword(formData.password) && formData.password && (
+          <small style={{ color: "red" }}>
+            Password ≥6 chars, 1 uppercase, 1 lowercase & 1 number
+          </small>
+        )}
 
         <select name="role" value={formData.role} onChange={handleChange}>
           <option value="journalist">Journalist</option>
@@ -90,7 +142,14 @@ const Register = () => {
         <button type="submit">Register</button>
       </form>
 
-      {message && <p className="message">{message}</p>}
+      {message && (
+        <p
+          className="message"
+          style={{ color: message.startsWith("✅") ? "green" : "red" }}
+        >
+          {message}
+        </p>
+      )}
 
       <p>
         Already have an account? <a href="/">Login here</a>

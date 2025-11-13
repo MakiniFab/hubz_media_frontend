@@ -22,8 +22,10 @@ export default function Rejected() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const rejected = res.data.filter((f) => f.status === "rejected");
-
+      const userId = parseInt(localStorage.getItem("id"));
+      const rejected = res.data.filter(
+        (f) => f.status === "rejected" && f.author_id === userId
+      );
       if (rejected.length === 0) {
         setMessage("No rejected submissions found.");
         setLoading(false);

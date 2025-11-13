@@ -23,8 +23,11 @@ export default function Approved() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const approved = res.data.filter((f) => f.status === "approved");
-
+      const userId = parseInt(localStorage.getItem("id"));
+      const approved = res.data.filter(
+        (f) => f.status === "approved" && f.author_id === userId
+      );
+      setFiles(approved);
       if (approved.length === 0) {
         setMessage("No approved submissions found.");
         setLoading(false);

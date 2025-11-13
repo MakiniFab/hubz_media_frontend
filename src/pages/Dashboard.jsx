@@ -13,9 +13,20 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const [authors, setAuthors] = useState({});
+  const PROFILE_API = "http://localhost:5000/auth/profile";
   const [user, setUser] = useState({ name: "", email: "", role: "" });
 
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.href = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+
+    return () => document.head.removeChild(link);
+  }, []);
 
   useEffect(() => {
     const storedName = localStorage.getItem("name") || "Guest User";
@@ -25,6 +36,34 @@ export default function Dashboard() {
     fetchFiles();
   }, []);
 
+  // Fetch author profiles in parallel
+  const fetchAuthorsParallel = async (subs) => {
+    const uniqueAuthorIds = [...new Set(subs.map((s) => s.author_id))].filter(
+      (id) => !authors[id]
+    );
+
+    if (uniqueAuthorIds.length === 0) return;
+
+    try {
+      const requests = uniqueAuthorIds.map((id) =>
+        axios
+          .get(`${PROFILE_API}/${id}`)
+          .then((res) => ({ id, data: res.data }))
+          .catch(() => ({ id, data: { name: `User ${id}`, email: "N/A" } }))
+      );
+
+      const results = await Promise.all(requests);
+
+      const newAuthors = {};
+      results.forEach((r) => {
+        newAuthors[r.id] = { name: r.data.name, email: r.data.email };
+      });
+      setAuthors((prev) => ({ ...prev, ...newAuthors }));
+    } catch (err) {
+      console.error("Error fetching author profiles:", err);
+    }
+  };
+
   const fetchFiles = async () => {
     try {
       const res = await axios.get(`${API_BASE}/list`, {
@@ -33,11 +72,11 @@ export default function Dashboard() {
 
       const userId = parseInt(localStorage.getItem("id")); 
       const filteredFiles = res.data.filter(
-        (file) => file.author_id === userId 
+        (file) => file.author_id === userId || file.status === "featured"
       );
 
       setFiles(filteredFiles);
-      console.log(filteredFiles)
+      fetchAuthorsParallel(filteredFiles); 
     } catch (err) {
       console.error("Error fetching files:", err);
       setMessage(
@@ -162,6 +201,9 @@ export default function Dashboard() {
             {files.map((file) => (
               <div className="file-card" key={file.id}>
                 <div className="file-icon">{getFileIcon(file.filename)}</div>
+                <p className="file-author">
+                  Author: {authors[file.author_id]?.name || "Loading..."}
+                </p>
                 <p className="file-created_at">
                   Submitted on:{" "}
                   {new Date(file.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}{" "}
@@ -170,8 +212,21 @@ export default function Dashboard() {
                 <h3 className="file-name">{file.filename}</h3>
                 <p className="file-title">{file.title}</p>
                 <button onClick={() => handleView(file.filename)} className="view-btn">
-                
-                  View
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                      marginRight: "8px"
+                    }}
+                  >
+                    download
+                  </span>
+                </button><br></br>
+                <button
+                  onClick={() => navigate(`/comments/${file.id}`)}
+                  className="dash-comment-btn"
+                >
+                  Comments
                 </button>
               </div>
             ))}

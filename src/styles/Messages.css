@@ -16,6 +16,7 @@
   font-weight: 700;
   color: #28a745; /* bright green */
   margin-bottom: 15px;
+  position: fixed;
 }
 
 .chat-messages {
@@ -30,6 +31,8 @@
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   transition: all 0.3s ease;
+  position: relative;
+  top: 5rem;
 }
 
 .chat-message {
@@ -164,7 +167,6 @@
 
 @media (max-width: 425px) {
   .chat-title{
-    position: relative;
     left: 5rem;
     font-size: 1.2rem;
     background: black;
@@ -177,7 +179,6 @@
 
 @media (min-width: 768px) {
   .chat-title{
-    position: relative;
     left: 5rem;
     font-size: 1.2rem;
     background: black;

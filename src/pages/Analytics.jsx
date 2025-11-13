@@ -1,169 +1,166 @@
+// src/pages/Analytics.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
 import "../styles/Analytics.css";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://localhost:5000";
+const token = localStorage.getItem("token");
 
 export default function Analytics() {
-  const [submissions, setSubmissions] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
 
-  const token = localStorage.getItem("token");
-
-  // Fetch all submissions
   useEffect(() => {
-    const fetchSubmissions = async () => {
+    const fetchAnalytics = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/files/list`, {
+        // 1️⃣ Fetch all users
+        const usersRes = await axios.get(`${API_BASE}/auth/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSubmissions(res.data);
+        const attachments = usersRes.data.filter(u => u.role === "attachment");
+
+        // 2️⃣ Fetch all submissions
+        const filesRes = await axios.get(`${API_BASE}/files/list`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const submissions = filesRes.data;
+
+        // 3️⃣ Fetch all comments per submission
+        const submissionComments = await Promise.all(
+          submissions.map(async (s) => {
+            const res = await axios.get(`${API_BASE}/comments/submission/${s.id}/comments`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            return { submission: s, comments: res.data };
+          })
+        );
+
+        // 4️⃣ Compute leaderboard
+        const globalMean = 3.5; // fallback if no ratings
+        const smoothing = 5;
+
+        const leaderboardData = attachments.map(user => {
+          const userSubmissions = submissionComments.filter(sc => sc.submission.author_id === user.id);
+          const total = userSubmissions.length;
+
+          if (total === 0) {
+            return {
+              id: user.id,
+              name: user.name,
+              totalSubmissions: 0,
+              featured: 0,
+              approved: 0,
+              rejected: 0,
+              approvalRatio: 0,
+              avgRating: 0,
+              bayesianScore: 0,
+            };
+          }
+
+          const featured = userSubmissions.filter(us => us.submission.status === "featured").length;
+          const approved = userSubmissions.filter(us => us.submission.status === "approved").length;
+          const rejected = userSubmissions.filter(us => us.submission.status === "rejected").length;
+
+          const approvalRatio = ((featured + approved) / total) * 100;
+
+          const allRatings = userSubmissions.flatMap(us =>
+            us.comments.map(c => c.rating).filter(r => r !== null)
+          );
+
+          const avgRating = allRatings.length > 0
+            ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length
+            : 0;
+
+          const bayesianScore = allRatings.length > 0
+            ? (avgRating * allRatings.length + globalMean * smoothing) / (allRatings.length + smoothing)
+            : 0;
+
+          return {
+            id: user.id,
+            name: user.name,
+            totalSubmissions: total,
+            featured,
+            approved,
+            rejected,
+            approvalRatio,
+            avgRating: avgRating.toFixed(2),
+            bayesianScore: bayesianScore.toFixed(2),
+          };
+        });
+
+        // Sort descending by bayesian score
+        leaderboardData.sort((a, b) => b.bayesianScore - a.bayesianScore);
+
+        setLeaderboard(leaderboardData);
       } catch (err) {
-        console.error("Error fetching submissions:", err);
-        setMessage("Failed to load submissions.");
+        console.error("Error fetching analytics:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchSubmissions();
+
+    fetchAnalytics();
   }, []);
-
-  // Analyze and compute leaderboard
-  useEffect(() => {
-    const analyze = async () => {
-      if (!submissions.length) return;
-
-      const grouped = {};
-      submissions.forEach((s) => {
-        const uid = s.author_id;
-        if (!grouped[uid]) grouped[uid] = { ratings: [], statuses: [], count: 0 };
-        grouped[uid].ratings.push(s.rating);
-        grouped[uid].statuses.push(s.status);
-        grouped[uid].count++;
-      });
-
-      // Cache user profiles to avoid duplicate requests
-      const userProfiles = {};
-      for (const uid of Object.keys(grouped)) {
-        if (!userProfiles[uid]) {
-          try {
-            const res = await axios.get(`${API_BASE}/auth/profile/${uid}`);
-            userProfiles[uid] = res.data;
-          } catch (err) {
-            console.warn(`Failed to load user ${uid}`, err);
-          }
-        }
-      }
-
-      // Compute stats
-      const allRatings = submissions.map((s) => s.rating).filter((r) => r != null);
-      const globalAvg =
-        allRatings.reduce((a, b) => a + b, 0) / (allRatings.length || 1);
-      const k = 5; // smoothing constant
-
-      const leaderboard = Object.entries(grouped).map(([uid, data]) => {
-        const ratings = data.ratings.filter((r) => r != null);
-        const avgRating =
-          ratings.reduce((a, b) => a + b, 0) / (ratings.length || 1);
-        const approved = data.statuses.filter((s) =>
-          s.toLowerCase().includes("approved")
-        ).length;
-        const approvalRatio = approved / data.count;
-
-        // Bayesian adjusted score
-        const adjusted =
-          (avgRating * data.count + globalAvg * k) / (data.count + k);
-
-        // Weighted blend of quality & activity
-        const overall = (adjusted * 0.7 + Math.log(data.count + 1) * 0.3).toFixed(
-          2
-        );
-
-        return {
-          user_id: uid,
-          name: userProfiles[uid]?.name || "Unknown User",
-          email: userProfiles[uid]?.email || "N/A",
-          submission_count: data.count,
-          avg_rating: avgRating.toFixed(2),
-          approval_ratio: approvalRatio.toFixed(2),
-          overall_score: parseFloat(overall),
-        };
-      });
-
-      leaderboard.sort((a, b) => b.overall_score - a.overall_score);
-      setLeaderboard(leaderboard);
-    };
-
-    analyze();
-  }, [submissions]);
 
   return (
     <div className="analytics-container">
       <Sidebar />
-      <div className="analytics-content">
-        <h1>📊 Submission Analytics</h1>
-
-        {loading ? (
-          <p>Loading data...</p>
-        ) : message ? (
-          <p className="error">{message}</p>
-        ) : leaderboard.length === 0 ? (
-          <p>No submissions found.</p>
-        ) : (
-          <>
-            <div className="leaderboard-section">
-              <h2>🏆 Leaderboard</h2>
-              <table className="leaderboard-table">
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Name</th>
-                    <th>Submissions</th>
-                    <th>Avg Rating</th>
-                    <th>Approval Ratio</th>
-                    <th>Overall Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leaderboard.map((u, i) => (
-                    <tr key={u.user_id}>
-                      <td>{i + 1}</td>
-                      <td>{u.name}</td>
-                      <td>{u.submission_count}</td>
-                      <td>{u.avg_rating}</td>
-                      <td>{u.approval_ratio}</td>
-                      <td>{u.overall_score}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="chart-section">
-              <h2>📈 Leaderboard Overview</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={leaderboard}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="overall_score" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </>
-        )}
+      <div className="analytics-description">
+        <h2>How the Analysis Works</h2>
+        <p>
+          This leaderboard evaluates all attachments based on their submitted articles
+          and the feedback received from reviewers. Each attachment’s submissions are 
+          categorized as <strong>Featured</strong>, <strong>Approved</strong>, or 
+          <strong>Rejected</strong>. Featured submissions indicate top-quality work, 
+          Approved submissions are acceptable, and Rejected submissions need improvement.
+        </p>
+        <p>
+          Additionally, each submission receives a rating from reviewers. The system 
+          calculates both the <strong>average rating</strong> and a <strong>Bayesian-adjusted 
+          score</strong> to account for differences in the number of reviews per attachment. 
+          The approval ratio and these scores collectively determine the ranking on the leaderboard.
+        </p>
+        <p>
+          This analysis is designed to provide a fair and comprehensive view of each attachment’s 
+          performance, helping you understand your strengths and areas for improvement.
+        </p>
       </div>
+      <h1>Attachment Leaderboard</h1>
+      {loading ? (
+        <p>Loading analytics...</p>
+      ) : (
+        <table className="analytics-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Submissions</th>
+              <th className="featured">Featured</th>
+              <th className="approved">Approved</th>
+              <th className="rejected">Rejected</th>
+              <th>Approval %</th>
+              <th>Avg Rating</th>
+              <th>Bayesian Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leaderboard.map((u, idx) => (
+              <tr key={u.id}>
+                <td>{idx + 1}</td>
+                <td>{u.name}</td>
+                <td>{u.totalSubmissions}</td>
+                <td data-label="Featured"><span>{u.featured}</span></td>
+                <td data-label="Approved"><span>{u.approved}</span></td>
+                <td data-label="Rejected"><span>{u.rejected}</span></td>
+                <td>{u.approvalRatio.toFixed(1)}%</td>
+                <td>{u.avgRating}</td>
+                <td>{u.bayesianScore}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

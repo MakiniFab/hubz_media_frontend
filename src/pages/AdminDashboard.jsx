@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/AdminDashboard.css";
+import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000/files";
-const PROFILE_API = "http://localhost:5000/auth/profile"; // will append user_id
+const PROFILE_API = "http://localhost:5000/auth/profile"; 
 
 export default function AdminDashboard() {
   const [submissions, setSubmissions] = useState([]);
@@ -49,13 +50,16 @@ export default function AdminDashboard() {
         axios
           .get(`${PROFILE_API}/${id}`)
           .then((res) => ({ id, data: res.data }))
-          .catch(() => ({ id, data: { name: `User ${id}`, email: "N/A" } }))
+          .catch(() => ({ id, data: { name: `User ${id}`, role: "N/A" } })) // fallback role
       );
 
       const results = await Promise.all(requests);
       const newAuthors = {};
       results.forEach((r) => {
-        newAuthors[r.id] = { name: r.data.name, email: r.data.email };
+        newAuthors[r.id] = {
+          name: r.data.name,
+          role: r.data.role,  // store role instead of email
+        };
       });
       setAuthors((prev) => ({ ...prev, ...newAuthors }));
     } catch (err) {
@@ -116,6 +120,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-dashboard">
+      <Sidebar />
       <h2>Admin Dashboard</h2>
       <button
         onClick={() => navigate("/dashboard")}
@@ -123,13 +128,13 @@ export default function AdminDashboard() {
       ></button>
       <div className="admin-cards-container">
         {submissions.map((s) => {
-          const author = authors[s.author_id] || { name: s.author_id, email: "N/A" };
+          const author = authors[s.author_id] || { name: s.author_id, role: "N/A" };
           return (
             <div key={s.id} className="admin-submission-card">
               <div className="admin-card-header">
                 <strong>{s.title}</strong>
                 <span className="admin-author-name">
-                  By: {author.name} ({author.email})
+                  By: <strong>{author.name}</strong> ({author.role})
                 </span>
               </div>
               <div className="admin-card-body">
@@ -141,26 +146,19 @@ export default function AdminDashboard() {
                     value={s.status}
                     onChange={(e) => updateSubmission(s.id, e.target.value, s.rating)}
                   >
-                    <option value="admin-pending">Pending</option>
-                    <option value="admin-approved">Approved</option>
-                    <option value="admin-rejected">Rejected</option>
+                    <option value="pending">Pending</option>
+                    <option value="featured">Feature</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
                   </select>
-                  <input
-                    type="number"
-                    min="0"
-                    max="5"
-                    value={s.rating || ""}
-                    onChange={(e) =>
-                      updateSubmission(s.id, s.status, parseInt(e.target.value) || 0)
-                    }
-                  />
+                  
                 </div>
                 <button className="admin-delete-btn" onClick={() => deleteSubmission(s.id)}>
                   Delete
                 </button>
                 <button
                   className="admin-comment-btn"
-                  onClick={() => navigate(`/comment/${s.id}`)}
+                  onClick={() => navigate(`/comments/${s.id}`)}
                 >
                   Comment
                 </button>
