@@ -30,10 +30,21 @@ export default function Dashboard() {
       const res = await axios.get(`${API_BASE}/list`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFiles(res.data);
+
+      const userId = parseInt(localStorage.getItem("id")); 
+      const filteredFiles = res.data.filter(
+        (file) => file.author_id === userId 
+      );
+
+      setFiles(filteredFiles);
+      console.log(filteredFiles)
     } catch (err) {
       console.error("Error fetching files:", err);
-      setMessage(err.response?.status === 401 ? "Unauthorized: Please log in again." : "Failed to load files.");
+      setMessage(
+        err.response?.status === 401
+          ? "Unauthorized: Please log in again."
+          : "Failed to load files."
+      );
     }
   };
 

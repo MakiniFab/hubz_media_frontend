@@ -8,6 +8,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +25,7 @@ function Login() {
 
       // ✅ Save all user details in localStorage
       localStorage.setItem("token", access_token);
+      localStorage.setItem("id", user.id);
       localStorage.setItem("role", user.role || "journalist");
       localStorage.setItem("name", user.name || "No Name");
       localStorage.setItem("email", user.email || "");
@@ -54,15 +56,31 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
+          <div style={{ position: "relative", width: "90%", margin: "0 auto 15px auto" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{ width: "100%", paddingRight: "40px" }}
+            />
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "35%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                fontSize: "1.1rem",
+                userSelect: "none"
+              }}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
           <button type="submit">Login</button>
         </form>
 

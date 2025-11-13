@@ -7,7 +7,7 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    role: "journalist",
+    role: "choose role",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
@@ -84,6 +84,7 @@ const Register = () => {
 
         <select name="role" value={formData.role} onChange={handleChange}>
           <option value="journalist">Journalist</option>
+          <option value="attachment">Attachment</option>
         </select>
 
         <button type="submit">Register</button>
