@@ -18,3 +18,41 @@
   background-color: #c82333;
   transform: translateY(-2px);
 }
+
+@media (max-width: 320px) {
+    .logout-btn {
+        position: fixed;
+        top: 23rem;
+        right: 1rem;
+        width: 50px;
+        height: 40px;
+  }
+
+  .sidebar.open {
+    left: 0;
+    height: 295px;
+    width: 150px;
+  }
+
+  .sidebar-title {
+    font-size: 1.3rem;
+    left: -30px;
+    top: 5px;
+  }
+
+  .sidebar-menu li{
+    margin: -15px;
+  }
+
+  .hamburger{
+    height: 9%;
+  }
+
+  .dashboard-header {
+    left: 4rem;
+  }
+
+  .dashboard-container {
+    margin-bottom: 6rem;
+  }
+}

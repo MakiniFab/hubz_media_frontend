@@ -44,7 +44,6 @@ function Login() {
   };
 
   return (
-    <div className="login-wrapper">
       <div className="login-container">
         <h2>Welcome Back</h2>
         <form onSubmit={onSubmit}>
@@ -84,7 +83,7 @@ function Login() {
           </div>
           <button type="submit">Login</button>
         </form>
-        <p>
+        <p className="login-reset-link" >  
           <Link
             to="/reset"
             style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
@@ -94,12 +93,11 @@ function Login() {
         </p>
         <p className="redirect-text">
           Don’t have an account?{" "}
-          <a href="/register" className="register-link">
+          <a href="/register" className="login-register-link">
             Register here
           </a>
         </p>
       </div>
-    </div>
   );
 }
 

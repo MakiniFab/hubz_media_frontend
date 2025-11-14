@@ -36,13 +36,6 @@ const Register = () => {
       setMessage("❌ Please enter a valid Gmail address (example@gmail.com).");
       return;
     }
-    if (!isValidPassword(formData.password)) {
-      setMessage(
-        "❌ Password must be at least 6 characters, include 1 uppercase, 1 lowercase, and 1 number."
-      );
-      return;
-    }
-
     try {
       // API call to backend
       const res = await fetch("https://hubz-media-backend.onrender.com/auth/register", {
@@ -128,18 +121,12 @@ const Register = () => {
             {showPassword ? "🙈" : "👁️"}
           </span>
         </div>
-        {!isValidPassword(formData.password) && formData.password && (
-          <small style={{ color: "red" }}>
-            Password ≥6 chars, 1 uppercase, 1 lowercase & 1 number
-          </small>
-        )}
-
         <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="journalist">Journalist</option>
-          <option value="attachment">Attachment</option>
+          <option className="register-select" value="journalist">Journalist</option>
+          <option className="register-select" value="attachment">Attachment</option>
         </select>
 
-        <button type="submit">Register</button>
+        <button className="register-button" type="submit">Register</button>
       </form>
 
       {message && (
@@ -150,8 +137,7 @@ const Register = () => {
           {message}
         </p>
       )}
-
-      <p>
+      <p className="register-link" >
         Already have an account? <a href="/">Login here</a>
       </p>
     </div>

@@ -39,7 +39,7 @@ function App() {
         <Route path="/private" element={<PrivateSend/>} />
       </Routes>
       <NotFoundWrapper />
-      {/* <Layout /> */}
+      <Layout />
     </BrowserRouter>
   );
 }

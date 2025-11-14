@@ -17,20 +17,9 @@
   font-size: 0.7rem;
 }
 
-@media (min-width: 768px) {
-  .footer-details p {
-    font-size: 0.8rem;
-  }
-}
-
-@media (min-width: 1024px) {
+@media (min-width: 410px) {
   .footer-details p {
     font-size: 1rem;
-  }
+    font-weight: bolder;
 }
-
-@media (min-width: 1440px) {
-  .footer-details p {
-    font-size: 1.2rem;
-  }
 }

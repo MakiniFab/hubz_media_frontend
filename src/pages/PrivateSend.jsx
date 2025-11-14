@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Sidebar from "../components/Sidebar";
 import "../styles/PrivateSend.css";
 import { toast } from "react-toastify";
 
@@ -125,6 +126,7 @@ export default function PrivateSend() {
 
   return (
     <div className="private-container">
+      <Sidebar />
       <h2 className="main-title">Private Messaging</h2>
 
       {/* SEND SECTION */}

@@ -1,20 +1,15 @@
-.login-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: white;
-  padding: 20px;
-}
-
 .login-container {
   max-width: 700px;
-  width: 100%;
-  padding: 25px;
+  width: 90%;
+  padding: 15px;
   border-radius: 10px;
   text-align: center;
-  background: linear-gradient(135deg, #00c6ff, #7effb2); /* blue-green gradient */
+  background: linear-gradient(135deg, #00c6ff, #7effb2); 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  left: 1.5rem;
+  top: -4rem;
+  height: 65vh;
 }
 
 .login-container h2 {
@@ -54,47 +49,49 @@
 }
 
 .redirect-text {
-  margin-top: 15px;
-  color: #002244;
+    color: #002244;
+    position: relative;
+    top: 2rem;
+    left: 2rem;
 }
 
-.register-link {
+.login-register-link {
   color: #003366;
   font-weight: bold;
   text-decoration: none;
+  position: relative;
+  top: 1rem;
+  left: -10rem;
 }
 
 .register-link:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
-  .login-container {
-    max-width: 95%;
-    padding: 50px;
-    margin-left: 5px; 
-    margin-right: 30px; 
-  }
-
-  .login-card {
-    width: 100%;     
-    max-width: 500px;  
-  }
+.login-reset-link {
+  position: relative;
+  top: 1rem;
 }
 
-@media (max-width: 320px) {
+@media (min-width: 410px) {
   .login-container {
-    max-width: 100%;
-    margin-left: -18px;
-    margin-right: -25px;
-    position: relative;
-    top: -3rem;
-    height: 340px;
-    padding: 20px;
+    width: 115%;
   }
+  .login-container input {
+    margin-bottom: 25px;
+    font-size: 1.2rem;
+    height: 7vh;
+  }
+  .login-container button {
+    width: 50%;
+    font-size: 1.5rem;
+    padding: 18px;
+  }
+  .login-reset-link {
+    font-size: 1.4rem;
+    top: 2rem;
+  }
+  .redirect-text {
 
-  .login-card {
-    width: 100%;     
-    max-width: 500px;  
   }
 }

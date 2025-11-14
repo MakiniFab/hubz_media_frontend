@@ -26,6 +26,9 @@ const Sidebar = () => {
             <Link to="/rejected" onClick={toggleSidebar}>Not Approved</Link>
           </li>
           <li>
+            <Link to="/private" onClick={toggleSidebar}>Inbox</Link>
+          </li>
+          <li>
             <Link to="/messages" onClick={toggleSidebar}>Chatroom</Link>
           </li>
           <li>

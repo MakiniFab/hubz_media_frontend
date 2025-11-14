@@ -45,6 +45,8 @@ body {
 
 .sidebar.open {
   left: 0;
+  width: 160px;
+  height: 55vh;
 }
 
 .sidebar-title {
