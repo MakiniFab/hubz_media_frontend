@@ -22,7 +22,6 @@ const fetchMessages = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    console.log(res.data)
     const filtered = res.data.filter(msg => {
       const c = msg.content?.trim();
       return !c?.startsWith( '{"file_url":');

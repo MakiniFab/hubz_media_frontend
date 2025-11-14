@@ -148,7 +148,6 @@ export default function Dashboard() {
       <Sidebar />
       <header className="dashboard-header">
         <div>
-          <h1>📁 File Dashboard</h1>
           {user.role === "admin" && (
             <button
               className="admin-btn"

@@ -7,7 +7,7 @@
   background: linear-gradient(135deg, #00c6ff, #7effb2); 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   position: relative;
-  left: 1.5rem;
+  left: 1.7rem;
   top: -4rem;
   height: 65vh;
 }
@@ -53,15 +53,16 @@
     position: relative;
     top: 2rem;
     left: 2rem;
+    white-space: nowrap;
 }
 
 .login-register-link {
-  color: #003366;
-  font-weight: bold;
-  text-decoration: none;
-  position: relative;
-  top: 1rem;
-  left: -10rem;
+    color: #003366;
+    font-weight: bold;
+    text-decoration: none;
+    position: relative;
+    top: 2rem;
+    left: -9.5rem;
 }
 
 .register-link:hover {
@@ -92,6 +93,8 @@
     top: 2rem;
   }
   .redirect-text {
-
+        left: 6rem;
+        width: 100px;
+        top: 3rem;
   }
 }

@@ -1,196 +1,98 @@
-/* ----------------------------
-   Analytics Container
----------------------------- */
+/* Container */
 .analytics-container {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 1rem 1.5rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #f0faff, #f5f5f8);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+/* Main content */
+.analytics-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  background-color: #fdfdfd;
+  gap: 15px;
+  overflow-y: auto;
+  max-height: 90vh; /* Scrollable for long leaderboard */
 }
 
-/* Page Title */
-.analytics-container h1 {
+/* Heading */
+.analytics-content h1 {
+  font-size: 1.8rem;
+  color: #28a745;
   text-align: center;
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: #007bff;
-  margin-bottom: 1rem;
 }
 
-/* Loading text */
-.loading-text {
+/* Loading / empty */
+.loading {
   text-align: center;
-  font-size: 1.2rem;
-  color: #555;
+  color: #777;
+  font-size: 1rem;
 }
 
-/* ----------------------------
-   Table Wrapper
----------------------------- */
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+/* Leaderboard cards container */
+.leaderboard-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 5px;
 }
 
-/* ----------------------------
-   Analytics Table
----------------------------- */
-.analytics-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 900px;
-  table-layout: fixed;
-}
-
-.analytics-table th,
-.analytics-table td {
+/* Individual user card */
+.leaderboard-card {
+  background: #ffffffc9;
+  border-left: 6px solid #28a745;
+  border-radius: 14px;
   padding: 12px 15px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow-y: auto; /* scroll if text is long */
+  max-height: 180px; /* adjust for small screens */
 }
 
-.analytics-table th {
-  background: linear-gradient(90deg, #007bff, #0056b3);
-  color: #fff;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  text-transform: uppercase;
-}
-
-.analytics-table tbody tr:nth-child(even) {
-  background-color: #f8f9fa;
-}
-
-.analytics-table tbody tr:hover {
-  background-color: #e3f2fd;
-}
-
-.analytics-table td {
-  font-size: 0.95rem;
-  color: #333;
-}
-
-/* Highlight top 3 users */
-.analytics-table tbody tr:nth-child(1) {
-  background-color: #fff3e0;
-}
-
-.analytics-table tbody tr:nth-child(2) {
-  background-color: #e3f2fd;
-}
-
-.analytics-table tbody tr:nth-child(3) {
-  background-color: #fce4ec;
-}
-
-/* ----------------------------
-   Buttons / Controls
----------------------------- */
-.view-btn, .dash-comment-btn {
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  background: linear-gradient(90deg, #28a745, #218838);
-  transition: all 0.2s ease-in-out;
-}
-
-.view-btn:hover, .dash-comment-btn:hover {
+.leaderboard-card:hover {
   transform: translateY(-2px);
-  background: linear-gradient(90deg, #218838, #1e7e34);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
-.analytics-description {
-  background-color: #f0f8ff;
-  border-left: 4px solid #007bff;
-  padding: 15px 20px;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+/* Card content */
+.leaderboard-card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+  color: #1b6f2a;
 }
 
-.analytics-description h2 {
-  margin-top: 0;
-  font-size: 1.6rem;
-  color: #007bff;
-}
-
-.analytics-description p {
+.leaderboard-card p {
   font-size: 0.95rem;
+  margin: 2px 0;
   color: #333;
-  line-height: 1.5;
-  margin-bottom: 0.8rem;
 }
 
-@media (max-width: 768px) {
-  .analytics-description {
-    padding: 10px 15px;
-  }
+/* Scrollbar for cards */
+.leaderboard-card::-webkit-scrollbar {
+  width: 6px;
+}
 
-  .analytics-description h2 {
-    font-size: 1.3rem;
-  }
+.leaderboard-card::-webkit-scrollbar-thumb {
+  background-color: #28a745;
+  border-radius: 8px;
+}
 
-  .analytics-description p {
-    font-size: 0.9rem;
-  }
+.leaderboard-card::-webkit-scrollbar-track {
+  background: #f5f5f8;
 }
 
 
-/* ----------------------------
-   Responsive Styles
----------------------------- */
-@media (max-width: 1024px) {
-  .analytics-container {
-    max-width: 95%;
-    padding: 1rem;
-  }
-
-  .analytics-table th,
-  .analytics-table td {
-    padding: 10px 12px;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .analytics-container {
-    position: fixed;
-    top: 3rem;
-    left: 0;
-    right: 0;
-    bottom: 0;          
-    overflow-y: auto;  
-    overflow-x: auto;  
-    padding-bottom: 5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .analytics-container h1 {
-    font-size: 1.6rem;
-  }
-
-  .analytics-table tbody td {
-    font-size: 0.75rem;
-    padding: 6px 8px;
-  }
-
-  .view-btn, .dash-comment-btn {
-    font-size: 0.7rem;
-    padding: 3px 6px;
+@media (min-width: 410px) {
+  .analytics-container{
+    top: 5rem;
+    margin-bottom: 10rem;
   }
 }

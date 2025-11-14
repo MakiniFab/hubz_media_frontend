@@ -1,17 +1,17 @@
-/* src/styles/Logout.css */
 .logout-btn {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  position: fixed; /* optional: top-right corner */
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s 
+    ease, transform 0.2s 
+    ease;
+    position: fixed;
+    bottom: 110px;
+    right: 15px;
+    z-index: 1000;
 }
 
 .logout-btn:hover {
@@ -19,40 +19,10 @@
   transform: translateY(-2px);
 }
 
-@media (max-width: 320px) {
-    .logout-btn {
-        position: fixed;
-        top: 23rem;
-        right: 1rem;
-        width: 50px;
-        height: 40px;
-  }
-
-  .sidebar.open {
-    left: 0;
-    height: 295px;
-    width: 150px;
-  }
-
-  .sidebar-title {
-    font-size: 1.3rem;
-    left: -30px;
-    top: 5px;
-  }
-
-  .sidebar-menu li{
-    margin: -15px;
-  }
-
-  .hamburger{
-    height: 9%;
-  }
-
-  .dashboard-header {
-    left: 4rem;
-  }
-
-  .dashboard-container {
-    margin-bottom: 6rem;
+@media (min-width: 410px) {
+  .logout-btn{
+    bottom: 10rem;
+    width: 70px;
+    height: 55px;
   }
 }
