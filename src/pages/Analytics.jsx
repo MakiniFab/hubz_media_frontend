@@ -94,17 +94,40 @@ export default function Analytics() {
         ) : leaderboard.length === 0 ? (
           <p className="loading">No data available.</p>
         ) : (
-          <div className="leaderboard-cards">
-            {leaderboard.map((user, idx) => (
-              <div className="leaderboard-card" key={user.id}>
-                <h2>{idx + 1}. {user.name}</h2>
-                <p><strong>Total Submissions:</strong> {user.totalSubmissions}</p>
-                <p><strong>Featured:</strong> {user.featured} | <strong>Approved:</strong> {user.approved} | <strong>Rejected:</strong> {user.rejected}</p>
-                <p><strong>Approval %:</strong> {user.approvalRatio.toFixed(1)}%</p>
-                <p><strong>Avg Rating:</strong> {user.avgRating}</p>
-                <p><strong>Bayesian Score:</strong> {user.bayesianScore}</p>
-              </div>
-            ))}
+          <div className="leaderboard-wrapper">
+            <div className="leaderboard-info">
+              <h2>How the Analysis Works</h2>
+              <p>
+                This leaderboard evaluates all attachments based on their submitted articles
+                and the feedback received from reviewers. Each attachment’s submissions are 
+                categorized as <strong>Featured</strong>, <strong>Approved</strong>, or 
+                <strong>Rejected</strong>. Featured submissions indicate top-quality work, 
+                Approved submissions are acceptable, and Rejected submissions need improvement.
+              </p>
+              <p>
+                Additionally, each submission receives a rating from reviewers. The system 
+                calculates both the <strong>average rating</strong> and a <strong>Bayesian-adjusted 
+                score</strong> to account for differences in the number of reviews per attachment. 
+                The approval ratio and these scores collectively determine the ranking on the leaderboard.
+              </p>
+              <p>
+                This analysis is designed to provide a fair and comprehensive view of each attachment’s 
+                performance, helping you understand your strengths and areas for improvement.
+              </p>
+            </div>
+
+            <div className="leaderboard-cards">
+              {leaderboard.map((user, idx) => (
+                <div className="leaderboard-card" key={user.id}>
+                  <h2>{idx + 1}. {user.name}</h2>
+                  <p><strong>Total Submissions:</strong> {user.totalSubmissions}</p>
+                  <p><strong>Featured:</strong> {user.featured} | <strong>Approved:</strong> {user.approved} | <strong>Rejected:</strong> {user.rejected}</p>
+                  <p><strong>Approval %:</strong> {user.approvalRatio.toFixed(1)}%</p>
+                  <p><strong>Avg Rating:</strong> {user.avgRating}</p>
+                  <p><strong>Bayesian Score:</strong> {user.bayesianScore}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

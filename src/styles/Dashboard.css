@@ -235,3 +235,24 @@ hr {
     margin-bottom: 9rem;
   }
 }
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    left: 0;
+    position: relative;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-container {
+    left: 3rem;
+    position: relative;
+  }
+}
+
+@media (min-width: 1440px) {
+  .dashboard-container {
+    left: 15rem;
+    position: relative;
+  }
+}

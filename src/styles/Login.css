@@ -98,3 +98,27 @@
         top: 3rem;
   }
 }
+
+@media (min-width: 410px) {
+  .login-container {
+    width: 115%;
+  }
+}
+
+@media (min-width: 768px) {
+  .login-container {
+    left: 15rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .login-container {
+    left: 25rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .login-container {
+    left: 35rem;
+  }
+}

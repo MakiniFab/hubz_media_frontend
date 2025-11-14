@@ -89,6 +89,27 @@
   background: #f5f5f8;
 }
 
+/* Wrap the info and cards together for ordering */
+.leaderboard-wrapper {
+  display: flex;
+  flex-direction: column; /* default for mobile */
+  gap: 20px;
+}
+
+/* Info section styling */
+.leaderboard-info {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* For larger screens, show info above the cards */
+@media screen and (min-width: 768px) {
+  .leaderboard-wrapper {
+    flex-direction: column;
+  }
+}
 
 @media (min-width: 410px) {
   .analytics-container{
