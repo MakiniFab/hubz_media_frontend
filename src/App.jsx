@@ -13,6 +13,8 @@ import Analytics from './pages/Analytics';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 import PrivateSend from "./pages/PrivateSend";
+import News from "./pages/News";
+import Events from "./pages/Events";
 
 // Component to conditionally show NotFound
 function NotFoundWrapper() {
@@ -35,8 +37,10 @@ function App() {
         <Route path="/approved" element={<Approved />} />
         <Route path="/rejected" element={<Rejected />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/private" element={<PrivateSend/>} />
+        <Route path="/news" element={<News/>} />
+        <Route path="/events" element={<Events/>} />
       </Routes>
       <NotFoundWrapper />
       <Layout />

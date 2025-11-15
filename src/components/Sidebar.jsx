@@ -17,7 +17,13 @@ const Sidebar = () => {
         <h2 className="sidebar-title">Menu</h2>
         <ul className="sidebar-menu">
           <li>
+            <Link to="/news" onClick={toggleSidebar}>Top News</Link>
+          </li>
+          <li>
             <Link to="/dashboard" onClick={toggleSidebar}>Home</Link>
+          </li>
+          <li>
+            <Link to="/events" onClick={toggleSidebar}>Calender Events</Link>
           </li>
           <li>
             <Link to="/approved" onClick={toggleSidebar}>Approved</Link>

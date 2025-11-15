@@ -1,132 +1,82 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/ResetPassword.css";
+import axios from "axios";
+import "../styles/ResetPassword.css"; 
 
-export default function ResetPassword() {
-  const [oldPassword, setOldPassword] = useState("");
+function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showOld, setShowOld] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // toggle state
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
-    if (newPassword !== confirmPassword) {
-      setMessage({ type: "error", text: "New passwords do not match" });
+    const tempToken = localStorage.getItem("temp_token");
+    if (!tempToken) {
+      setError("No temporary token found. Please login again.");
       return;
     }
 
-    setLoading(true);
-    setMessage(null);
-
     try {
-      const token = localStorage.getItem("token");
+      await axios.post(
+        "https://hubz-media-backend.onrender.com/auth/change-password",
+        { new_password: newPassword },
+        {
+          headers: { Authorization: `Bearer ${tempToken}` },
+        }
+      );
 
-      const response = await fetch("https://hubz-media-backend.onrender.com/auth/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          old_password: oldPassword,
-          new_password: newPassword,
-        }),
-      });
+      setSuccess("Password updated successfully. Please login again.");
+      localStorage.removeItem("temp_token");
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMessage({ type: "error", text: data.msg || "Failed to update password" });
-      } else {
-        setMessage({ type: "success", text: data.msg });
-        setTimeout(() => navigate("/dashboard"), 1500);
-      }
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setMessage({ type: "error", text: "Server error" });
-    } finally {
-      setLoading(false);
+      console.error("Reset password error:", err);
+      setError(err.response?.data?.msg || "Failed to reset password");
     }
   };
 
   return (
-    <div className="reset-password-container">
-      <h2>Reset Password</h2>
-      {message && (
-        <p className={message.type === "error" ? "error-msg" : "success-msg"}>
-          {message.text}
-        </p>
-      )}
-      <form onSubmit={handleSubmit}>
-        {/* Old Password */}
-        <div className="input-group">
-          <label>Old Password</label>
-          <div className="password-wrapper">
-            <input
-              type={showOld ? "text" : "password"}
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              className="show-hide-btn"
-              onClick={() => setShowOld((prev) => !prev)}
-            >
-              {showOld ? "🙈" : "👁️"}
-            </button>
-          </div>
+    <div className="reset-container">
+      <h2>Reset Your Password</h2>
+      {error && <p className="error">{error}</p>}
+      {success && <p className="success">{success}</p>}
+
+      <form onSubmit={onSubmit}>
+        <div style={{ position: "relative", marginBottom: "20px" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+            style={{ width: "100%", paddingRight: "40px" }}
+          />
+          <span
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "35%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              fontSize: "1.1rem",
+              userSelect: "none",
+            }}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
         </div>
 
-        {/* New Password */}
-        <div className="input-group">
-          <label>New Password</label>
-          <div className="password-wrapper">
-            <input
-              type={showNew ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              className="show-hide-btn"
-              onClick={() => setShowNew((prev) => !prev)}
-            >
-              {showNew ? "🙈" : "👁️"}
-            </button>
-          </div>
-        </div>
-
-        {/* Confirm New Password */}
-        <div className="input-group">
-          <label>Confirm New Password</label>
-          <div className="password-wrapper">
-            <input
-              type={showConfirm ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              className="show-hide-btn"
-              onClick={() => setShowConfirm((prev) => !prev)}
-            >
-              {showConfirm ? "🙈" : "👁️"}
-            </button>
-          </div>
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Updating..." : "Update Password"}
-        </button>
+        <button type="submit">Change Password</button>
       </form>
     </div>
   );
 }
+
+export default ResetPassword;
