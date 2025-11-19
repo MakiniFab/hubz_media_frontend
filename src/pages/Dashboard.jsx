@@ -72,7 +72,7 @@ export default function Dashboard() {
 
       const userId = parseInt(localStorage.getItem("id")); 
       const filteredFiles = res.data.filter(
-        (file) => file.author_id === userId || file.status === "featured"
+        (file) => file.author_id === userId || file.status === "approved"
       );
 
       setFiles(filteredFiles);
