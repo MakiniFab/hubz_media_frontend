@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import "../styles/Dashboard.css";
 
 const API_BASE = "https://hubz-media-backend.onrender.com/files";
+const PROFILE_API = "https://hubz-media-backend.onrender.com/auth/profile";
 
 export default function Dashboard() {
   const [files, setFiles] = useState([]);
@@ -12,29 +13,47 @@ export default function Dashboard() {
   const [title, setTitle] = useState("");
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
   const [authors, setAuthors] = useState({});
-  const PROFILE_API = "https://hubz-media-backend.onrender.com/auth/profile";
+  const [adminList, setAdminList] = useState([]);
+  const [sendTo, setSendTo] = useState("ALL"); // default: send to all admins
   const [user, setUser] = useState({ name: "", email: "", role: "" });
 
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  // Load Google Material Symbols
   useEffect(() => {
     const link = document.createElement("link");
     link.href = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined";
     link.rel = "stylesheet";
     document.head.appendChild(link);
-
     return () => document.head.removeChild(link);
   }, []);
 
+  // Load user info and files
   useEffect(() => {
     const storedName = localStorage.getItem("name") || "Guest User";
     const storedEmail = localStorage.getItem("email") || "guest@example.com";
     const storedRole = localStorage.getItem("role") || "user";
     setUser({ name: storedName, email: storedEmail, role: storedRole });
+
     fetchFiles();
+    fetchAdmins();
   }, []);
+
+  // Fetch admin users (for sendTo dropdown)
+  const fetchAdmins = async () => {
+    try {
+      const res = await axios.get("https://hubz-media-backend.onrender.com/auth/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const admins = res.data.filter(u => u.role === "admin");
+      setAdminList(admins);
+    } catch (err) {
+      console.error("Failed to fetch admins:", err);
+    }
+  };
 
   // Fetch author profiles in parallel
   const fetchAuthorsParallel = async (subs) => {
@@ -64,19 +83,20 @@ export default function Dashboard() {
     }
   };
 
+  // Fetch files
   const fetchFiles = async () => {
     try {
       const res = await axios.get(`${API_BASE}/list`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const userId = parseInt(localStorage.getItem("id")); 
+      const userId = parseInt(localStorage.getItem("id"));
       const filteredFiles = res.data.filter(
         (file) => file.author_id === userId || file.status === "approved"
       );
 
       setFiles(filteredFiles);
-      fetchAuthorsParallel(filteredFiles); 
+      fetchAuthorsParallel(filteredFiles);
     } catch (err) {
       console.error("Error fetching files:", err);
       setMessage(
@@ -87,6 +107,7 @@ export default function Dashboard() {
     }
   };
 
+  // Upload file
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!selectedFile) {
@@ -94,18 +115,27 @@ export default function Dashboard() {
       return;
     }
 
+    // Include sendTo in the title
+    let finalTitle = title || selectedFile.name;
+    finalTitle = `[TO: ${sendTo}] ${finalTitle}`;
+
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("title", title || selectedFile.name);
+    formData.append("title", finalTitle);
 
     try {
       setUploading(true);
       setMessage("");
 
       const res = await axios.post(`${API_BASE}/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
         onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
           setMessage(`Uploading... ${percentCompleted}%`);
         },
       });
@@ -114,6 +144,7 @@ export default function Dashboard() {
       fetchFiles();
       setSelectedFile(null);
       setTitle("");
+      setSendTo("ALL");
     } catch (err) {
       console.error("Upload error:", err);
       setMessage(err.response?.status === 401 ? "Unauthorized: Please log in again." : "File upload failed.");
@@ -149,10 +180,7 @@ export default function Dashboard() {
       <header className="dashboard-header">
         <div>
           {user.role === "admin" && (
-            <button
-              className="admin-btn"
-              onClick={() => navigate("/admin")}
-            >
+            <button className="admin-btn" onClick={() => navigate("/admin")}>
               Admin
             </button>
           )}
@@ -175,6 +203,21 @@ export default function Dashboard() {
           onChange={(e) => setTitle(e.target.value)}
           disabled={uploading}
         />
+
+        {/* Send To Dropdown */}
+        <select
+          value={sendTo}
+          onChange={(e) => setSendTo(e.target.value)}
+          disabled={uploading}
+        >
+          <option value="ALL">Send to ALL admins</option>
+          {adminList.map(admin => (
+            <option key={admin.name} value={admin.name}>
+              {admin.name}
+            </option>
+          ))}
+        </select>
+
         <button type="submit" disabled={uploading}>
           {uploading ? "Uploading..." : "Upload"}
         </button>
@@ -213,14 +256,12 @@ export default function Dashboard() {
                 <button onClick={() => handleView(file.filename)} className="view-btn">
                   <span
                     className="material-symbols-outlined"
-                    style={{
-                      fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
-                      marginRight: "8px"
-                    }}
+                    style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24", marginRight: "8px" }}
                   >
                     download
                   </span>
-                </button><br></br>
+                </button>
+                <br />
                 <button
                   onClick={() => navigate(`/comments/${file.id}`)}
                   className="dash-comment-btn"

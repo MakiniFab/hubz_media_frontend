@@ -5,16 +5,18 @@ import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = "https://hubz-media-backend.onrender.com/files";
-const PROFILE_API = "https://hubz-media-backend.onrender.com/auth/profile"; 
+const PROFILE_API = "https://hubz-media-backend.onrender.com/auth/profile";
 
 export default function AdminDashboard() {
   const [submissions, setSubmissions] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [authors, setAuthors] = useState({}); 
-  const navigate = useNavigate();
+  const [authors, setAuthors] = useState({});
+  const [showMine, setShowMine] = useState(false);
 
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const currentAdminName = localStorage.getItem("name") || "";
 
   // Fetch submissions
   const fetchSubmissions = async () => {
@@ -50,7 +52,7 @@ export default function AdminDashboard() {
         axios
           .get(`${PROFILE_API}/${id}`)
           .then((res) => ({ id, data: res.data }))
-          .catch(() => ({ id, data: { name: `User ${id}`, role: "N/A" } })) // fallback role
+          .catch(() => ({ id, data: { name: `User ${id}`, role: "N/A" } }))
       );
 
       const results = await Promise.all(requests);
@@ -58,7 +60,7 @@ export default function AdminDashboard() {
       results.forEach((r) => {
         newAuthors[r.id] = {
           name: r.data.name,
-          role: r.data.role,  // store role instead of email
+          role: r.data.role,
         };
       });
       setAuthors((prev) => ({ ...prev, ...newAuthors }));
@@ -82,12 +84,16 @@ export default function AdminDashboard() {
       fetchSubmissions();
     } catch (err) {
       console.error(err);
-      alert("Failed to update submission: " + (err.response?.data?.error || err.message));
+      alert(
+        "Failed to update submission: " +
+          (err.response?.data?.error || err.message)
+      );
     }
   };
 
   const deleteSubmission = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this submission?")) return;
+    if (!window.confirm("Are you sure you want to delete this submission?"))
+      return;
     try {
       await axios.delete(`${API_BASE}/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +101,10 @@ export default function AdminDashboard() {
       fetchSubmissions();
     } catch (err) {
       console.error(err);
-      alert("Failed to delete submission: " + (err.response?.data?.error || err.message));
+      alert(
+        "Failed to delete submission: " +
+          (err.response?.data?.error || err.message)
+      );
     }
   };
 
@@ -105,7 +114,9 @@ export default function AdminDashboard() {
       window.open(res.data.url, "_blank");
     } catch (err) {
       console.error(err);
-      alert("Failed to view file: " + (err.response?.data?.error || err.message));
+      alert(
+        "Failed to view file: " + (err.response?.data?.error || err.message)
+      );
     }
   };
 
@@ -121,54 +132,88 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <Sidebar />
-      <h2>Admin Dashboard</h2>
-      <button
-        onClick={() => navigate("/dashboard")}
-        className="home-button"
-      ></button>
+      <div className="admin-header">
+        <h2>Admin Dashboard</h2>
+        <div>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="home-button"
+          >
+            Home
+          </button>
+          <button
+            onClick={() => setShowMine(!showMine)}
+            className="filter-btn"
+          >
+            {showMine
+              ? "Show All Submissions"
+              : "Show Only My Submissions"}
+          </button>
+        </div>
+      </div>
+
       <div className="admin-cards-container">
-        {submissions.map((s) => {
-          const author = authors[s.author_id] || { name: s.author_id, role: "N/A" };
-          return (
-            <div key={s.id} className="admin-submission-card">
-              <div className="admin-card-header">
-                <strong>{s.title}</strong>
-                <span className="admin-author-name">
-                  By: <strong>{author.name}</strong> ({author.role})
-                </span>
-              </div>
-              <div className="admin-card-body">
-                <button className="admin-view-btn" onClick={() => viewFile(s.filename)}>
-                  View File
-                </button>
-                <div className="admin-status-rating">
-                  <select
-                    value={s.status}
-                    onChange={(e) => updateSubmission(s.id, e.target.value, s.rating)}
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="featured">Feature</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
-                  
+        {submissions
+          .filter((s) => {
+            if (!showMine) return true;
+            // Check title prefix [TO: ...]
+            const match = s.title.match(/^\[TO:\s*(.+?)\]/);
+            if (!match) return false; // skip if no prefix
+            const target = match[1];
+            return target === "ALL" || target === currentAdminName;
+          })
+          .map((s) => {
+            const author =
+              authors[s.author_id] || { name: s.author_id, role: "N/A" };
+            return (
+              <div key={s.id} className="admin-submission-card">
+                <div className="admin-card-header">
+                  <strong>{s.title}</strong>
+                  <span className="admin-author-name">
+                    By: <strong>{author.name}</strong> ({author.role})
+                  </span>
                 </div>
-                <button className="admin-delete-btn" onClick={() => deleteSubmission(s.id)}>
-                  Delete
-                </button>
-                <button
-                  className="admin-comment-btn"
-                  onClick={() => navigate(`/comments/${s.id}`)}
-                >
-                  Comment
-                </button>
+                <div className="admin-card-body">
+                  <button
+                    className="admin-view-btn"
+                    onClick={() => viewFile(s.filename)}
+                  >
+                    View File
+                  </button>
+                  <div className="admin-status-rating">
+                    <select
+                      value={s.status}
+                      onChange={(e) =>
+                        updateSubmission(s.id, e.target.value, s.rating)
+                      }
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="featured">Feature</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                  <button
+                    className="admin-delete-btn"
+                    onClick={() => deleteSubmission(s.id)}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="admin-comment-btn"
+                    onClick={() => navigate(`/comments/${s.id}`)}
+                  >
+                    Comment
+                  </button>
+                </div>
+                <div className="admin-card-footer">
+                  <small>
+                    Created: {new Date(s.created_at).toLocaleString()}
+                  </small>
+                </div>
               </div>
-              <div className="admin-card-footer">
-                <small>Created: {new Date(s.created_at).toLocaleString()}</small>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </div>
   );
