@@ -162,3 +162,43 @@
   margin-top: 2rem;
   font-weight: bold;
 }
+
+/* TAB BAR */
+.tab-bar {
+  display: flex;
+  gap: 20px;
+  margin: 20px;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #e8e8e8;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-weight: 600;
+}
+
+.tab-item:hover {
+  background: #d3d3d3;
+}
+
+.tab-item.active {
+  background: #4a90e2;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Material icons inside tabs */
+.tab-item .material-symbols-outlined {
+  font-size: 22px;
+}
+
+/* Optional: make buttons smooth */
+.tab-item p {
+  margin: 0;
+  font-size: 15px;
+}

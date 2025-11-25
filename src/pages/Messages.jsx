@@ -24,7 +24,8 @@ const fetchMessages = async () => {
 
     const filtered = res.data.filter(msg => {
       const c = msg.content?.trim();
-      return !c?.startsWith( '{"file_url":');
+      // Remove file messages AND inbox messages
+      return !c?.startsWith('{"file_url":') && !c?.startsWith("inbox:");
     });
 
     setMessages(filtered);

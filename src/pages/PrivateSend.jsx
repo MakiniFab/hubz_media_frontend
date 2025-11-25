@@ -1,121 +1,116 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import "../styles/PrivateSend.css";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const API_BASE = "https://hubz-media-backend.onrender.com";
 
 export default function PrivateSend() {
-  const token = localStorage.getItem("token");
-  const userId = parseInt(localStorage.getItem("id"));
-
-  const [submissions, setSubmissions] = useState([]);
   const [users, setUsers] = useState([]);
-  const [selectedSubmission, setSelectedSubmission] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
+  const [recipient, setRecipient] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ------------------------------------------------------
-  // Fetch submissions (all user submissions) + all users
-  // ------------------------------------------------------
+  const messagesEndRef = useRef(null);
+  const token = localStorage.getItem("token");
+  const me = parseInt(localStorage.getItem("id")); // your user id
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Fetch all users except self
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const filesRes = await axios.get(`${API_BASE}/files/list`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    axios
+      .get(`${API_BASE}/auth/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const otherUsers = res.data.filter((u) => u.id !== me);
+        setUsers(otherUsers);
+      })
+      .catch((err) => console.error(err));
+  }, [me, token]);
 
-        // store: title, file_url, filename, author_id, etc
-        setSubmissions(filesRes.data.filter(f => f.author_id === userId));
+  // Fetch private messages between me and recipient
+  const loadMessages = async () => {
+    if (!recipient) return;
 
-        const usersRes = await axios.get(`${API_BASE}/auth/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setUsers(usersRes.data);
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to fetch submissions or users");
-      }
-    };
-    fetchData();
-  }, [token, userId]);
-
-  // ------------------------------------------------------
-  // Fetch private messages sent to this user
-  // ------------------------------------------------------
-  const fetchMessages = async () => {
     try {
       const res = await axios.get(`${API_BASE}/messages/chat/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const userMessages = res.data.filter(msg => {
-        try {
-          const parsed = JSON.parse(msg.content);
-          return parsed.receiver_id === userId;
-        } catch {
-          return false;
-        }
-      });
+      // Filter messages that start with "inbox:" and are between us
+      const privateMsgs = res.data
+        .filter((msg) => msg.content.startsWith("inbox:"))
+        .filter((msg) => {
+          const parts = msg.content.split(":");
+          if (parts.length < 3) return false;
 
-      setMessages(userMessages.reverse());
+          const msgRecipientId = parseInt(parts[1]);
+          const msgText = parts.slice(2).join(":");
+
+          // Message is between me and recipient
+          return (
+            (msg.sender_id === me && msgRecipientId === recipient.id) ||
+            (msg.sender_id === recipient.id && msgRecipientId === me)
+          );
+        })
+        .map((msg) => {
+          const parts = msg.content.split(":");
+          return { ...msg, text: parts.slice(2).join(":") };
+        })
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+      setMessages(privateMsgs);
+      scrollToBottom();
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load messages");
+      toast.error("Failed to load private messages");
     }
   };
 
+  // Poll messages every 4 seconds
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    loadMessages();
+    const interval = setInterval(loadMessages, 4000);
+    return () => clearInterval(interval);
+  }, [recipient]);
 
-  // ------------------------------------------------------
-  // View file securely (using filename)
-  // ------------------------------------------------------
-  const handleView = async (filename) => {
-    try {
-      const res = await axios.get(`${API_BASE}/view/${filename}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      window.open(res.data.url, "_blank");
-    } catch (err) {
-      console.error("Error opening file:", err);
-      toast.error("Could not view file.");
-    }
-  };
-
-  // ------------------------------------------------------
-  // Send message containing file info
-  // ------------------------------------------------------
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!selectedSubmission || !selectedUser)
-      return toast.warning("Select a submission and a user");
+  // Send private message
+  const sendMessage = async () => {
+    if (!recipient) return toast.error("Select a recipient first");
+    if (!text.trim()) return toast.warning("Message cannot be empty");
 
     setLoading(true);
-
     try {
-      const sub = submissions.find(s => s.id === parseInt(selectedSubmission));
+      const content = `inbox:${recipient.id}:${text}`;
 
-      const content = {
-        file_url: sub.file_url,
-        filename: sub.filename, 
-        title: sub.title,
-        receiver_id: parseInt(selectedUser)
-      };
-      console.log("Sending message:", content);
+      // Immediately push into state for instant display
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(), // temporary id
+          sender_id: me,
+          text,
+          content,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+      setText("");
+      scrollToBottom();
+
+      // Send to server
       await axios.post(
         `${API_BASE}/messages/chat/send`,
-        { content: JSON.stringify(content) },
+        { content },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Message sent!");
-      setSelectedSubmission("");
-      setSelectedUser("");
-      fetchMessages();
     } catch (err) {
       console.error(err);
       toast.error("Failed to send message");
@@ -125,88 +120,59 @@ export default function PrivateSend() {
   };
 
   return (
-    <div className="private-container">
+    <div className="private-wrapper">
       <Sidebar />
-      <h2 className="main-title">Private Messaging</h2>
+      <div className="private-main">
+        <h2>Private Inbox</h2>
 
-      {/* SEND SECTION */}
-      <div className="send-card">
-        <h3>Send a Submission</h3>
-
-        {/* Select user submission */}
-        <select
-          value={selectedSubmission}
-          onChange={(e) => setSelectedSubmission(e.target.value)}
-        >
-          <option value="">-- Select your submission --</option>
-          {submissions.map((sub) => (
-            <option key={sub.id} value={sub.id}>
-              {sub.title} — ({sub.filename})
-            </option>
-          ))}
-        </select>
-
-        {/* Select user */}
-        <select
-          value={selectedUser}
-          onChange={(e) => setSelectedUser(e.target.value)}
-        >
-          <option value="">-- Select user --</option>
+        {/* User selector */}
+        <div className="user-list">
           {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name} ({u.email})
-            </option>
+            <div
+              key={u.id}
+              className={`user-item ${recipient?.id === u.id ? "active" : ""}`}
+              onClick={() => setRecipient(u)}
+            >
+              {u.name || u.fullname || u.email}
+            </div>
           ))}
-        </select>
+        </div>
 
-        <button onClick={handleSendMessage} disabled={loading}>
-          {loading ? "Sending..." : "Send"}
-        </button>
-      </div>
-
-      {/* RECEIVED MESSAGES */}
-      <h3 className="sub-title">Messages Sent To You</h3>
-
-      <div className="messages-wrapper">
-        {messages.length === 0 ? (
-          <p className="no-messages">No messages yet.</p>
-        ) : (
-          messages.map((msg) => {
-            let parsed = {};
-            try {
-              parsed = JSON.parse(msg.content);
-            } catch {}
-
-            return (
-              <div key={msg.id} className="message-bubble received">
-
-                {/* FILE URL AT TOP */}
-                <div className="message-top-url">
-                  {parsed.file_url}
-                </div>
-
-                {/* Secure file viewer */}
-                <button
-                  className="view-btn"
-                  onClick={() => handleView(parsed.filename)}
+        {/* Chat box */}
+        {recipient && (
+          <div className="chat-box">
+            <h3>Chat with {recipient.name || recipient.fullname}</h3>
+            <div className="messages">
+              {messages.length === 0 && <p className="no-messages">No messages yet</p>}
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`message-bubble ${msg.sender_id === me ? "me" : "them"}`}
                 >
-                  View File
-                </button>
-
-                {/* File title */}
-                <div className="message-info">
-                  <strong>{parsed.title}</strong>
+                  {msg.text}
                 </div>
+              ))}
+              <div ref={messagesEndRef}></div>
+            </div>
 
-                {/* Timestamp */}
-                <div className="timestamp">
-                  {new Date(msg.created_at).toLocaleString()}
-                </div>
-
-              </div>
-            );
-          })
+            <div className="send-area">
+              <input
+                type="text"
+                placeholder="Type message..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              />
+              <button onClick={sendMessage} disabled={loading}>
+                {loading ? "Sending..." : "Send"}
+              </button>
+            </div>
+          </div>
         )}
+
+        {!recipient && <p>Select a user to start chatting.</p>}
+
+        <ToastContainer position="bottom-right" />
       </div>
     </div>
   );
