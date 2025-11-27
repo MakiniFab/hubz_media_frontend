@@ -106,10 +106,6 @@ const CommentPage = () => {
                 <p className="comment-rating-display">⭐ Rating: {comment.rating}</p>
               )}
               <p className="comment-meta">
-                Comment by:{" "}
-                <strong>
-                  {comment.admin_name || comment.admin?.name || "Unknown"}
-                </strong>{" "}
                 • {new Date(comment.created_at).toLocaleString()}
               </p>
             </div>

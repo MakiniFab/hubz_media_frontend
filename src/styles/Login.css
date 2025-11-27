@@ -1,6 +1,6 @@
 .login-container {
   max-width: 700px;
-  width: 90%;
+  width: 80%;
   padding: 15px;
   border-radius: 10px;
   text-align: center;
@@ -8,7 +8,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   position: relative;
   left: 1.7rem;
-  top: -4rem;
+  top: 5rem;
   height: 65vh;
 }
 
@@ -74,51 +74,9 @@
   top: 1rem;
 }
 
-@media (min-width: 410px) {
-  .login-container {
-    width: 115%;
-  }
-  .login-container input {
-    margin-bottom: 25px;
-    font-size: 1.2rem;
-    height: 7vh;
-  }
-  .login-container button {
-    width: 50%;
-    font-size: 1.5rem;
-    padding: 18px;
-  }
-  .login-reset-link {
-    font-size: 1.4rem;
-    top: 2rem;
-  }
-  .redirect-text {
-        left: 6rem;
-        width: 100px;
-        top: 3rem;
-  }
-}
-
-@media (min-width: 410px) {
-  .login-container {
-    width: 115%;
-  }
-}
-
 @media (min-width: 768px) {
   .login-container {
-    left: 15rem;
+    left: 5rem;
   }
 }
 
-@media (min-width: 1024px) {
-  .login-container {
-    left: 25rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .login-container {
-    left: 35rem;
-  }
-}

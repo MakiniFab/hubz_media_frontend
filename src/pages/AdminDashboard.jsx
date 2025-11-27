@@ -12,7 +12,8 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authors, setAuthors] = useState({});
-  const [filterMode, setFilterMode] = useState("ALL"); // "ALL" or "MINE"
+  const [filterMode, setFilterMode] = useState("ALL"); 
+  const [mineCategory, setMineCategory] = useState("pending");
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -126,6 +127,7 @@ export default function AdminDashboard() {
         <p>Loading submissions...</p>
       </div>
     );
+
   if (error) return <div className="error-message">Error: {error}</div>;
 
   return (
@@ -133,13 +135,13 @@ export default function AdminDashboard() {
       <Sidebar />
 
       <div className="admin-header">
-        <h2>Admin Dashboard</h2>
+        <h2></h2>
         <button onClick={() => navigate("/dashboard")} className="home-button">
           Home
         </button>
       </div>
 
-      {/* 🔥 New Tab Bar */}
+      {/* 🔥 Mode Tabs */}
       <div className="tab-bar">
         <div
           className={`tab-item ${filterMode === "ALL" ? "active" : ""}`}
@@ -158,36 +160,62 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* 🔥 Category Tabs (Only for MINE) */}
+      {filterMode === "MINE" && (
+        <div className="category-tabs">
+          <button
+            className={mineCategory === "pending" ? "active" : ""}
+            onClick={() => setMineCategory("pending")}
+          >
+            Pending
+          </button>
+          <button
+            className={mineCategory === "featured" ? "active" : ""}
+            onClick={() => setMineCategory("featured")}
+          >
+            Featured
+          </button>
+          <button
+            className={mineCategory === "rejected" ? "active" : ""}
+            onClick={() => setMineCategory("rejected")}
+          >
+            Rejected
+          </button>
+        </div>
+      )}
+
+      {/* 🔥 Cards */}
       <div className="admin-cards-container">
         {submissions
           .filter((s) => {
             if (filterMode === "ALL") return true;
 
-            // FilterMode === "MINE"
             const match = s.title.match(/^\[TO:\s*(.+?)\]/);
             if (!match) return false;
 
             const target = match[1].trim();
-            return target === currentAdminName;   // ONLY show mine
+            if (target !== currentAdminName) return false;
+
+            if (s.status === "approved") return false;
+
+            return s.status === mineCategory;
           })
+
           .map((s) => {
             const author =
               authors[s.author_id] || { name: s.author_id, role: "N/A" };
 
             return (
               <div key={s.id} className="admin-submission-card">
-                <div className="admin-card-header">
-                  <strong>{s.title}</strong>
-                  <span className="admin-author-name">
-                    By: <strong>{author.name}</strong> ({author.role})
-                  </span>
-                </div>
-
                 <div className="admin-card-body">
-                  <button
-                    className="admin-view-btn"
-                    onClick={() => viewFile(s.filename)}
-                  >
+                  <div className="admin-card-header">
+                    <strong>{s.title}</strong>
+                    <span className="admin-author-name">
+                      By: <strong>{author.name}</strong> ({author.role})
+                    </span>
+                  </div>
+
+                  <button className="admin-view-btn" onClick={() => viewFile(s.filename)}>
                     View File
                   </button>
 
@@ -204,6 +232,14 @@ export default function AdminDashboard() {
                       <option value="rejected">Rejected</option>
                     </select>
                   </div>
+                </div>
+                <div className="admin-actions">
+                  <button
+                    className="admin-comment-btn"
+                    onClick={() => navigate(`/comments/${s.id}`)}
+                  >
+                    Comment
+                  </button>
 
                   <button
                     className="admin-delete-btn"
@@ -211,20 +247,11 @@ export default function AdminDashboard() {
                   >
                     Delete
                   </button>
-
-                  <button
-                    className="admin-comment-btn"
-                    onClick={() => navigate(`/comments/${s.id}`)}
-                  >
-                    Comment
-                  </button>
                 </div>
 
-                <div className="admin-card-footer">
-                  <small>
-                    Created: {new Date(s.created_at).toLocaleString()}
-                  </small>
-                </div>
+                <small className="admin-card-footer">
+                  {new Date(s.created_at).toLocaleString()}
+                </small>
               </div>
             );
           })}

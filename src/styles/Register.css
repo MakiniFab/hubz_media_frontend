@@ -7,7 +7,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     position: relative;
-    top: -3rem;
+    top: 5rem;
     left: 1rem;
     height: 65vh;
 }
@@ -96,21 +96,3 @@
     }
 
   }
-
-@media (min-width: 768px) {
-  .register-container {
-      left: 5rem;
-    }
-}
-
-@media (min-width: 1024px) {
-  .register-container {
-      left: 15rem;
-    }
-}
-
-@media (min-width: 1440px) {
-  .register-container {
-      left: 30rem;
-    }
-}
